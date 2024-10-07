@@ -1,7 +1,11 @@
 {
     "cSpell.words": [
-        "sqlalchemy",
+        "onupdate",
         "psycopg",
+        "Shopcart",
+        "Shopcarts",
+        "sqlalchemy",
         "testdb"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "off"
 }
