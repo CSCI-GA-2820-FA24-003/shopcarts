@@ -128,24 +128,23 @@ class TestShopcart(TestCase):
         self.assertEqual(created_at_date, test_shopcart.created_at)
         self.assertEqual(last_updated_date, test_shopcart.last_updated)
 
-        # Todo: uncomment this code when get_shopcarts is implemented
-        # # Check that the location header was correct
-        # response = self.client.get(location)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # new_shopcart = response.get_json()
-        # self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
-        # self.assertEqual(new_shopcart["items"], test_shopcart.items)
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_shopcart = response.get_json()
+        self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
+        self.assertEqual(new_shopcart["items"], test_shopcart.items)
 
-        # # Convert the string date to a datetime object
-        # created_at_date = datetime.strptime(
-        #     new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        # ).date()
-        # last_updated_date = datetime.strptime(
-        #     new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        # ).date()
-        # # Compare the parsed date with `test_shopcart.created_at`
-        # self.assertEqual(created_at_date, test_shopcart.created_at)
-        # self.assertEqual(last_updated_date, test_shopcart.last_updated)
+        # Convert the string date to a datetime object
+        created_at_date = datetime.strptime(
+            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
+        ).date()
+        last_updated_date = datetime.strptime(
+            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
+        ).date()
+        # Compare the parsed date with `test_shopcart.created_at`
+        self.assertEqual(created_at_date, test_shopcart.created_at)
+        self.assertEqual(last_updated_date, test_shopcart.last_updated)
 
     # ----------------------------------------------------------
     # TEST LIST
@@ -157,3 +156,18 @@ class TestShopcart(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), 5)
+
+    def test_get_shopcart(self):
+        """It should get a single Shopcart"""
+        test_shopcart = self._create_shopcarts(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_shopcart.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["id"], test_shopcart.id)
+
+    def test_get_shopcart_when_shopcart_not_found(self):
+        """It should not get a Shopcart that's not found"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("Shopcart with id '0' could not be found.", data["message"])
