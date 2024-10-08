@@ -25,10 +25,14 @@ from unittest import TestCase
 from wsgi import app
 from service.common import status
 from service.models import db, Shopcart
+from .factories import ShopcartFactory
+from datetime import datetime
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
+
+BASE_URL = "/shopcarts"
 
 
 ######################################################################
@@ -72,4 +76,51 @@ class TestShopcart(TestCase):
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    # Todo: Add your test cases here...
+    # ----------------------------------------------------------
+    # TEST CREATE
+    # ----------------------------------------------------------
+    def test_create_shopcart(self):
+        """It should Create a new Shopcart"""
+        test_shopcart = ShopcartFactory()
+        logging.debug("Test Shopcart: %s", test_shopcart.serialize())
+        response = self.client.post(BASE_URL, json=test_shopcart.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_shopcart = response.get_json()
+        self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
+        self.assertEqual(new_shopcart["items"], test_shopcart.items)
+
+        # Convert the string date to a datetime object
+        created_at_date = datetime.strptime(
+            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
+        ).date()
+        last_updated_date = datetime.strptime(
+            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
+        ).date()
+        # Compare the parsed date with `test_shopcart.created_at`
+        self.assertEqual(created_at_date, test_shopcart.created_at)
+        self.assertEqual(last_updated_date, test_shopcart.last_updated)
+
+        # Todo: uncomment this code when get_shopcarts is implemented
+        # # Check that the location header was correct
+        # response = self.client.get(location)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # new_shopcart = response.get_json()
+        # self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
+        # self.assertEqual(new_shopcart["items"], test_shopcart.items)
+
+        # # Convert the string date to a datetime object
+        # created_at_date = datetime.strptime(
+        #     new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
+        # ).date()
+        # last_updated_date = datetime.strptime(
+        #     new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
+        # ).date()
+        # # Compare the parsed date with `test_shopcart.created_at`
+        # self.assertEqual(created_at_date, test_shopcart.created_at)
+        # self.assertEqual(last_updated_date, test_shopcart.last_updated)
