@@ -70,6 +70,25 @@ class TestShopcart(TestCase):
         """This runs after each test"""
         db.session.remove()
 
+    ############################################################
+    # Utility function to bulk create shopcarts
+    ############################################################
+    def _create_shopcarts(self, count: int = 1) -> list:
+        """Factory method to create shopcarts in bulk"""
+        shopcarts = []
+        for _ in range(count):
+            test_shopcart = ShopcartFactory()
+            response = self.client.post(BASE_URL, json=test_shopcart.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test shopcart",
+            )
+            new_shopcart = response.get_json()
+            test_shopcart.id = new_shopcart["id"]
+            shopcarts.append(test_shopcart)
+        return shopcarts
+
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
@@ -109,21 +128,46 @@ class TestShopcart(TestCase):
         self.assertEqual(created_at_date, test_shopcart.created_at)
         self.assertEqual(last_updated_date, test_shopcart.last_updated)
 
-        # Todo: uncomment this code when get_shopcarts is implemented
-        # # Check that the location header was correct
-        # response = self.client.get(location)
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # new_shopcart = response.get_json()
-        # self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
-        # self.assertEqual(new_shopcart["items"], test_shopcart.items)
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_shopcart = response.get_json()
+        self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
+        self.assertEqual(new_shopcart["items"], test_shopcart.items)
 
-        # # Convert the string date to a datetime object
-        # created_at_date = datetime.strptime(
-        #     new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        # ).date()
-        # last_updated_date = datetime.strptime(
-        #     new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        # ).date()
-        # # Compare the parsed date with `test_shopcart.created_at`
-        # self.assertEqual(created_at_date, test_shopcart.created_at)
-        # self.assertEqual(last_updated_date, test_shopcart.last_updated)
+        # Convert the string date to a datetime object
+        created_at_date = datetime.strptime(
+            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
+        ).date()
+        last_updated_date = datetime.strptime(
+            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
+        ).date()
+        # Compare the parsed date with `test_shopcart.created_at`
+        self.assertEqual(created_at_date, test_shopcart.created_at)
+        self.assertEqual(last_updated_date, test_shopcart.last_updated)
+
+    # ----------------------------------------------------------
+    # TEST LIST
+    # ----------------------------------------------------------
+    def test_get_shopcart_list(self):
+        """It should Get a list of Shopcarts"""
+        self._create_shopcarts(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+
+    def test_get_shopcart(self):
+        """It should get a single Shopcart"""
+        test_shopcart = self._create_shopcarts(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_shopcart.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["id"], test_shopcart.id)
+
+    def test_get_shopcart_when_shopcart_not_found(self):
+        """It should not get a Shopcart that's not found"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("Shopcart with id '0' could not be found.", data["message"])
