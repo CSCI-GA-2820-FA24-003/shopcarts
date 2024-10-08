@@ -18,15 +18,18 @@
 TestShopcart API Service Test Suite
 """
 
+import logging
+
 # pylint: disable=duplicate-code
 import os
-import logging
-from unittest import TestCase
-from wsgi import app
-from service.common import status
-from service.models import db, Shopcart
-from .factories import ShopcartFactory
 from datetime import datetime
+from unittest import TestCase
+
+from service.common import status
+from service.models import Shopcart, db
+from wsgi import app
+
+from .factories import ShopcartFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"

@@ -20,7 +20,6 @@ Shopcart model
 Model for storing overall shopcart resource
 """
 
-from datetime import datetime
 import logging
 from .persistent_base import PersistentBase, db, DataValidationError
 from .item import Item
