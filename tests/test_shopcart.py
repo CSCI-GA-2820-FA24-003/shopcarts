@@ -126,8 +126,6 @@ class TestShopcart(TestCase):
         shopcart.customer_name = "New Name"
         shopcart.update()
 
-        # TODO: check that "updated_at" changed properly
-
         # Fetch it back again
         shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(shopcart.customer_name, "New Name")
@@ -167,7 +165,7 @@ class TestShopcart(TestCase):
         self.assertEqual(shopcarts, [])
         for shopcart in ShopcartFactory.create_batch(5):
             shopcart.create()
-        # Assert that there are not 5 shiocarts in the database
+        # Assert that there are 5 shopcarts in the database
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 5)
 

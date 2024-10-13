@@ -22,6 +22,7 @@ import logging
 
 # pylint: disable=duplicate-code
 import os
+from datetime import datetime
 from unittest import TestCase
 
 from service.common import status
