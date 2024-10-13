@@ -153,6 +153,13 @@ class TestShopcart(TestCase):
             old_updated_time,
         )
 
+    def test_delete_shopcart(self):
+        """It should Delete a Shopcart"""
+        # get the id of a shopcart
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
     # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------
