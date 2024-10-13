@@ -223,6 +223,32 @@ def create_items(shopcart_id):
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
+######################################################################
+# RETRIEVE ALL ITEMS FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
+def get_items(shopcart_id):
+    """
+    Retrieve all Items from a Shopcart
+
+    This endpoint will return all items for a specific shopcart based on its id
+    """
+    app.logger.info("Request for all items in Shopcart with id: %s", shopcart_id)
+
+    # Find the shopcart by its ID, return 404 if not found
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+
+    # Serialize and return the items in the shopcart
+    items = [item.serialize() for item in shopcart.items]
+    app.logger.info("Returning %d items", len(items))
+    return jsonify(items), status.HTTP_200_OK
+
+
 # ---------------------------------------------------------------------
 #                U  T I L I T Y   F U N C T I O N S
 # ---------------------------------------------------------------------
