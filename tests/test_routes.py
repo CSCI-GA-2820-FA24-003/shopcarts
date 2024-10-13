@@ -22,7 +22,7 @@ import logging
 
 # pylint: disable=duplicate-code
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest import TestCase
 
 from service.common import status
@@ -166,7 +166,8 @@ class TestShopcart(TestCase):
         updated_account = resp.get_json()
         self.assertEqual(updated_account["customer_name"], "New name")
         self.assertGreater(
-            datetime.fromisoformat(updated_account["last_updated"]), old_updated_time
+            datetime.fromisoformat(updated_account["last_updated"]).replace(tzinfo=UTC),
+            old_updated_time,
         )
 
     # ----------------------------------------------------------
