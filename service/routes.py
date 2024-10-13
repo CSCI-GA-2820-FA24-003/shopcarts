@@ -139,7 +139,7 @@ def update_shopcarts(shopcart_id):
     # Update from the json in the body of the request
     updated_json = request.get_json()
     if "items" not in updated_json:
-        updated_json["items"] = shopcart.item.serialize()
+        updated_json["items"] = shopcart.serialize()["items"]
     shopcart.deserialize(updated_json)
     shopcart.id = shopcart_id
     shopcart.last_updated = datetime.now()
