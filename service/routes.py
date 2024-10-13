@@ -97,11 +97,11 @@ def create_shopcarts():
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcarts(shopcart_id):
     """
-    Retrieve a single Account
+    Retrieve a single Shopcart
 
-    This endpoint will return an Account based on it's id
+    This endpoint will return a Shopcart based on it's id
     """
-    app.logger.info("Request for Account with id: %s", shopcart_id)
+    app.logger.info("Request for Shopcart with id: %s", shopcart_id)
 
     # See if the account exists and abort if it doesn't
     shopcart = Shopcart.find(shopcart_id)

@@ -36,6 +36,7 @@ DATABASE_URI = os.getenv(
 class TestItem(TestCase):
     """Item Model Test Cases"""
 
+    # pylint: disable=duplicate-code
     @classmethod
     def setUpClass(cls):
         """This runs once before the entire test suite"""
@@ -60,12 +61,13 @@ class TestItem(TestCase):
         """This runs after each test"""
         db.session.remove()
 
+    # pylint: enable=duplicate-code
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
 
     def test_add_shopcart_item(self):
-        """It should Create an shopcart with an item and add it to the database"""
+        """It should Create a shopcart with an item and add it to the database"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
