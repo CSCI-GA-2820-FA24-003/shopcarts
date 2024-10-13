@@ -19,6 +19,7 @@ Item model
 
 Model for storing subordinate Item resources for within a Shopcart
 """
+from datetime import datetime
 import logging
 from .persistent_base import PersistentBase, db, DataValidationError
 
@@ -44,8 +45,8 @@ class Item(db.Model, PersistentBase):
     quantity = db.Column(db.Integer)
 
     # Database auditing fields
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_updated = db.Column(
+    created_at: datetime = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    last_updated: datetime = db.Column(
         db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False
     )
 
@@ -64,8 +65,8 @@ class Item(db.Model, PersistentBase):
             "description": self.description,
             "price": self.price,
             "quantity": self.quantity,
-            "created_at": self.created_at,
-            "last_updated": self.last_updated,
+            "created_at": self.created_at.isoformat(),
+            "last_updated": self.last_updated.isoformat(),
         }
 
     def deserialize(self, data: dict) -> None:
@@ -81,8 +82,8 @@ class Item(db.Model, PersistentBase):
             self.description = data["description"]
             self.price = data["price"]
             self.quantity = data["quantity"]
-            self.created_at = data["created_at"]
-            self.last_updated = data["last_updated"]
+            self.created_at = datetime.fromisoformat(data["created_at"])
+            self.last_updated = datetime.fromisoformat(data["last_updated"])
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:

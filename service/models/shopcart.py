@@ -20,6 +20,7 @@ Shopcart model
 Model for storing overall shopcart resource
 """
 
+from datetime import datetime
 import logging
 from .persistent_base import PersistentBase, db, DataValidationError
 from .item import Item
@@ -44,8 +45,8 @@ class Shopcart(db.Model, PersistentBase):
     items = db.relationship("Item", backref="shopcart", passive_deletes=True)
 
     # Database auditing fields
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-    last_updated = db.Column(
+    created_at: datetime = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    last_updated: datetime = db.Column(
         db.DateTime, default=db.func.now(), onupdate=db.func.now(), nullable=False
     )
 
@@ -58,8 +59,8 @@ class Shopcart(db.Model, PersistentBase):
             "id": self.id,
             "customer_name": self.customer_name,
             "items": [],
-            "created_at": self.created_at,
-            "last_updated": self.last_updated,
+            "created_at": self.created_at.isoformat(),
+            "last_updated": self.last_updated.isoformat(),
         }
         for item in self.items:
             shopcart["items"].append(item.serialize())
@@ -73,10 +74,9 @@ class Shopcart(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
-            # self.id = data["id"] do we need this
             self.customer_name = data["customer_name"]
-            self.created_at = data["created_at"]
-            self.last_updated = data["last_updated"]
+            self.created_at = datetime.fromisoformat(data["created_at"])
+            self.last_updated = datetime.fromisoformat(data["last_updated"])
 
             # handle inner list of items
             item_list = data.get("items")

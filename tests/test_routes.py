@@ -128,17 +128,6 @@ class TestShopcart(TestCase):
         self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
         self.assertEqual(new_shopcart["items"], test_shopcart.items)
 
-        # Convert the string date to a datetime object
-        created_at_date = datetime.strptime(
-            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        last_updated_date = datetime.strptime(
-            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        # Compare the parsed date with `test_shopcart.created_at`
-        self.assertEqual(created_at_date, test_shopcart.created_at)
-        self.assertEqual(last_updated_date, test_shopcart.last_updated)
-
     # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------

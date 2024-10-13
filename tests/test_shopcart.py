@@ -189,8 +189,10 @@ class TestShopcart(TestCase):
         serial_shopcart = shopcart.serialize()
         self.assertEqual(serial_shopcart["id"], shopcart.id)
         self.assertEqual(serial_shopcart["customer_name"], shopcart.customer_name)
-        self.assertEqual(serial_shopcart["created_at"], shopcart.created_at)
-        self.assertEqual(serial_shopcart["last_updated"], shopcart.last_updated)
+        self.assertEqual(serial_shopcart["created_at"], shopcart.created_at.isoformat())
+        self.assertEqual(
+            serial_shopcart["last_updated"], shopcart.last_updated.isoformat()
+        )
         self.assertEqual(len(serial_shopcart["items"]), 1)
         items = serial_shopcart["items"]
         self.assertEqual(items[0]["id"], item.id)
@@ -199,8 +201,8 @@ class TestShopcart(TestCase):
         self.assertEqual(items[0]["description"], item.description)
         self.assertEqual(items[0]["price"], item.price)
         self.assertEqual(items[0]["quantity"], item.quantity)
-        self.assertEqual(items[0]["created_at"], item.created_at)
-        self.assertEqual(items[0]["last_updated"], item.last_updated)
+        self.assertEqual(items[0]["created_at"], item.created_at.isoformat())
+        self.assertEqual(items[0]["last_updated"], item.last_updated.isoformat())
 
     def test_deserialize_a_shopcart(self):
         """It should Deserialize a shopcart"""

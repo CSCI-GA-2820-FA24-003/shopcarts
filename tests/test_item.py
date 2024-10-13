@@ -150,8 +150,8 @@ class TestItem(TestCase):
         self.assertEqual(serial_item["description"], item.description)
         self.assertEqual(serial_item["price"], item.price)
         self.assertEqual(serial_item["quantity"], item.quantity)
-        self.assertEqual(serial_item["created_at"], item.created_at)
-        self.assertEqual(serial_item["last_updated"], item.last_updated)
+        self.assertEqual(serial_item["created_at"], item.created_at.isoformat())
+        self.assertEqual(serial_item["last_updated"], item.last_updated.isoformat())
 
     def test_deserialize_an_item(self):
         """It should deserialize an Item"""
