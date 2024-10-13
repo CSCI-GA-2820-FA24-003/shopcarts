@@ -52,7 +52,7 @@ class ItemFactory(Factory):
     description = FuzzyChoice(
         choices=["a shirt to wear", "a pant to wear", "a hat to wear"]
     )
-    price = FuzzyDecimal(0.1, 20.0)
+    price = Faker("pyfloat", min_value=0.1, max_value=20.0, right_digits=2)
     quantity = FuzzyInteger(1, 30)
     created_at = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
     last_updated = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
