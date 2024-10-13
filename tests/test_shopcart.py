@@ -211,8 +211,6 @@ class TestShopcart(TestCase):
         new_shopcart = Shopcart()
         new_shopcart.deserialize(serial_shopcart)
         self.assertEqual(new_shopcart.customer_name, shopcart.customer_name)
-        self.assertEqual(new_shopcart.created_at, shopcart.created_at)
-        self.assertEqual(new_shopcart.last_updated, shopcart.last_updated)
 
     def test_deserialize_with_key_error(self):
         """It should not Deserialize a shopcart with a KeyError"""

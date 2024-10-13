@@ -164,5 +164,3 @@ class TestItem(TestCase):
         self.assertEqual(new_item.description, item.description)
         self.assertEqual(new_item.price, item.price)
         self.assertEqual(new_item.quantity, item.quantity)
-        self.assertEqual(new_item.created_at, item.created_at)
-        self.assertEqual(new_item.last_updated, item.last_updated)

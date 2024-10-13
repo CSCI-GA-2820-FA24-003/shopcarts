@@ -77,11 +77,11 @@ def create_shopcarts():
     data = request.get_json()
     # Make sure to fill in the audit dates and start with an empty item list
     data["items"] = []
-    data["created_at"] = datetime.now().isoformat()
-    data["last_updated"] = datetime.now().isoformat()
 
     app.logger.info("Processing: %s", data)
     shopcart.deserialize(data)
+    shopcart.created_at = datetime.now()
+    shopcart.last_updated = datetime.now()
 
     # Save the new Shopcart to the database
     shopcart.create()

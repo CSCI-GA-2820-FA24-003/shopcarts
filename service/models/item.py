@@ -82,8 +82,7 @@ class Item(db.Model, PersistentBase):
             self.description = data["description"]
             self.price = data["price"]
             self.quantity = data["quantity"]
-            self.created_at = datetime.fromisoformat(data["created_at"])
-            self.last_updated = datetime.fromisoformat(data["last_updated"])
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:

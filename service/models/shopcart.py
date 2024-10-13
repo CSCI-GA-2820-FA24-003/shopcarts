@@ -75,8 +75,6 @@ class Shopcart(db.Model, PersistentBase):
         """
         try:
             self.customer_name = data["customer_name"]
-            self.created_at = datetime.fromisoformat(data["created_at"])
-            self.last_updated = datetime.fromisoformat(data["last_updated"])
 
             # handle inner list of items
             item_list = data.get("items")
