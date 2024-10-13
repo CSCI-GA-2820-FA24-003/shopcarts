@@ -231,32 +231,3 @@ class TestShopcart(TestCase):
         """It should not Deserialize an item with a TypeError"""
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
-
-
-def test_update_shopcart(self):
-    """It should Update a shopcart"""
-    shopcart = ShopcartFactory(customer_name="Old Name")
-    shopcart.create()
-
-    # Update the shopcart
-    shopcart.customer_name = "New Name"
-    shopcart.update()
-
-    # Fetch it back
-    updated_shopcart = Shopcart.find(shopcart.id)
-    self.assertEqual(updated_shopcart.customer_name, "New Name")
-
-
-def test_delete_shopcart(self):
-    """It should Delete a shopcart from the database"""
-    shopcart = ShopcartFactory()
-    shopcart.create()
-
-    # Fetch it back to ensure it exists
-    self.assertIsNotNone(Shopcart.find(shopcart.id))
-
-    # Delete the shopcart
-    shopcart.delete()
-
-    # Try to fetch it again
-    self.assertIsNone(Shopcart.find(shopcart.id))

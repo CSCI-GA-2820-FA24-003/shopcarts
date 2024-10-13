@@ -89,7 +89,7 @@ def create_shopcarts():
 
     # Return the location of the new Shopcart
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
-    # location_url = "unknown"
+
     return (
         jsonify(shopcart.serialize()),
         status.HTTP_201_CREATED,
@@ -116,6 +116,39 @@ def get_shopcarts(shopcart_id):
             status.HTTP_404_NOT_FOUND,
             f"Shopcart with id '{shopcart_id}' could not be found.",
         )
+
+    return jsonify(shopcart.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+# UPDATE AN EXISTING SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+def update_shopcarts(shopcart_id):
+    """
+    Update a Shopcart
+
+    This endpoint will update a Shopcart based the body that is posted
+    """
+    app.logger.info("Request to shopcart account with id: %s", shopcart_id)
+    check_content_type("application/json")
+
+    # See if the shopcart exists and abort if it doesn't
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' was not found.",
+        )
+
+    # Update from the json in the body of the request
+    updated_json = request.get_json()
+    if "items" not in updated_json:
+        updated_json["items"] = shopcart.serialize()["items"]
+    shopcart.deserialize(updated_json)
+    shopcart.id = shopcart_id
+    shopcart.last_updated = datetime.now()
+    shopcart.update()
 
     return jsonify(shopcart.serialize()), status.HTTP_200_OK
 
