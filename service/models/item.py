@@ -41,7 +41,7 @@ class Item(db.Model, PersistentBase):
     )
     name = db.Column(db.String(64))
     description = db.Column(db.String(64))
-    price = db.Column(db.Float)
+    price = db.Column(db.Numeric(10, 2, asdecimal=False))
     quantity = db.Column(db.Integer)
 
     # Database auditing fields

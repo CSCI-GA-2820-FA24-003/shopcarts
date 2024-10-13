@@ -29,7 +29,7 @@ from service.common import status
 from service.models import Shopcart, db
 from wsgi import app
 
-from .factories import ShopcartFactory
+from .factories import ItemFactory, ShopcartFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -206,3 +206,42 @@ class TestShopcart(TestCase):
         """It should not allow an illegal method call"""
         resp = self.client.put(BASE_URL, json={"not": "today"})
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    ######################################################################
+    #  I T E M   T E S T   C A S E S
+    ######################################################################
+
+    def test_add_item(self):
+        """It should Add an item to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["name"], item.name)
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(data["price"], item.price)
+        self.assertEqual(data["quantity"], item.quantity)
+
+        # Make sure server assigned a created/updated date
+        # (this will overwrite the ones from factory)
+        self.assertIsNotNone(item.created_at)
+        self.assertIsNotNone(item.last_updated)
+
+        # TODO: uncomment when get_items is implemented
+        # # Check that the location header was correct by getting it
+        # resp = self.client.get(location, content_type="application/json")
+        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        # new_address = resp.get_json()
+        # self.assertEqual(new_address["name"], address.name, "Address name does not match")

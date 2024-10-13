@@ -24,7 +24,7 @@ and Delete Shopcart
 from datetime import datetime
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Shopcart
+from service.models import Shopcart, Item
 from service.common import status  # HTTP Status Codes
 
 
@@ -171,6 +171,61 @@ def update_shopcarts(shopcart_id):
     shopcart.update()
 
     return jsonify(shopcart.serialize()), status.HTTP_200_OK
+
+
+# ---------------------------------------------------------------------
+#                I T E M   M E T H O D S
+# ---------------------------------------------------------------------
+
+
+######################################################################
+# ADD AN ITEM TO A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
+def create_items(shopcart_id):
+    """
+    Create an Item on a Shopcart
+
+    This endpoint will add an item to a shopcart
+    """
+    app.logger.info("Request to create an Item for Shopcart with id: %s", shopcart_id)
+    check_content_type("application/json")
+
+    # See if the shopcart exists and abort if it doesn't
+    shopcart: Shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+
+    # Create an item from the json data
+    item = Item()
+    item.deserialize(request.get_json())
+    item.shopcart_id = shopcart_id
+    item.created_at = datetime.now()
+    item.last_updated = datetime.now()
+    shopcart.last_updated = datetime.now()
+
+    # Append the item to the shopcart
+    shopcart.items.append(item)
+    shopcart.update()
+
+    # Prepare a message to return
+    message = item.serialize()
+
+    # TODO: uncomment when get_items is implemented
+    # # Send the location to GET the new item
+    # location_url = url_for(
+    #     "get_items", shopcart_id=shopcart.id, item_id=item.id, _external=True
+    # )
+    location_url = "unknown"
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
+
+# ---------------------------------------------------------------------
+#                U  T I L I T Y   F U N C T I O N S
+# ---------------------------------------------------------------------
 
 
 ######################################################################
