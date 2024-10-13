@@ -21,6 +21,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Shopcart
 """
 
+from datetime import datetime
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
 from service.models import Shopcart
@@ -74,8 +75,13 @@ def create_shopcarts():
     shopcart = Shopcart()
     # Get the data from the request and deserialize it
     data = request.get_json()
+    # Make sure to fill in the audit dates and start with an empty item list
+    data["items"] = []
+
     app.logger.info("Processing: %s", data)
     shopcart.deserialize(data)
+    shopcart.created_at = datetime.now()
+    shopcart.last_updated = datetime.now()
 
     # Save the new Shopcart to the database
     shopcart.create()
@@ -83,7 +89,7 @@ def create_shopcarts():
 
     # Return the location of the new Shopcart
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
-    # location_url = "unknown"
+
     return (
         jsonify(shopcart.serialize()),
         status.HTTP_201_CREATED,
@@ -97,11 +103,11 @@ def create_shopcarts():
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcarts(shopcart_id):
     """
-    Retrieve a single Account
+    Retrieve a single Shopcart
 
-    This endpoint will return an Account based on it's id
+    This endpoint will return a Shopcart based on it's id
     """
-    app.logger.info("Request for Account with id: %s", shopcart_id)
+    app.logger.info("Request for Shopcart with id: %s", shopcart_id)
 
     # See if the account exists and abort if it doesn't
     shopcart = Shopcart.find(shopcart_id)
@@ -132,6 +138,39 @@ def delete_shopcarts(shopcart_id):
         shopcart.delete()
 
     return "", status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# UPDATE AN EXISTING SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+def update_shopcarts(shopcart_id):
+    """
+    Update a Shopcart
+
+    This endpoint will update a Shopcart based on the body that is posted
+    """
+    app.logger.info("Request to update shopcart with id: %s", shopcart_id)
+    check_content_type("application/json")
+
+    # See if the shopcart exists and abort if it doesn't
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' was not found.",
+        )
+
+    # Update from the json in the body of the request
+    updated_json = request.get_json()
+    if "items" not in updated_json:
+        updated_json["items"] = shopcart.serialize()["items"]
+    shopcart.deserialize(updated_json)
+    shopcart.id = shopcart_id
+    shopcart.last_updated = datetime.now()
+    shopcart.update()
+
+    return jsonify(shopcart.serialize()), status.HTTP_200_OK
 
 
 ######################################################################

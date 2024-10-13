@@ -2,9 +2,9 @@
 Test Factory to make fake objects for testing
 """
 
-from datetime import date
+from datetime import datetime, UTC
 from factory import Factory, SubFactory, Sequence, Faker, post_generation
-from factory.fuzzy import FuzzyChoice, FuzzyDate, FuzzyDecimal, FuzzyInteger
+from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyDecimal, FuzzyInteger
 from service.models import Shopcart, Item
 
 
@@ -19,8 +19,9 @@ class ShopcartFactory(Factory):
 
     id = Sequence(lambda n: n)
     customer_name = Faker("name")
-    created_at = FuzzyDate(date(2008, 1, 1))
-    last_updated = FuzzyDate(date(2008, 1, 1))
+    created_at = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
+    last_updated = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
+
     # the many side of relationships can be a little wonky in factory boy:
     # https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
 
@@ -53,6 +54,6 @@ class ItemFactory(Factory):
     )
     price = FuzzyDecimal(0.1, 20.0)
     quantity = FuzzyInteger(1, 30)
-    created_at = FuzzyDate(date(2008, 1, 1))
-    last_updated = FuzzyDate(date(2008, 1, 1))
+    created_at = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
+    last_updated = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
     shopcart = SubFactory(ShopcartFactory)
