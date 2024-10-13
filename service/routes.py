@@ -21,6 +21,7 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Shopcart
 """
 
+from datetime import datetime
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
 from service.models import Shopcart
@@ -74,8 +75,13 @@ def create_shopcarts():
     shopcart = Shopcart()
     # Get the data from the request and deserialize it
     data = request.get_json()
+    # Make sure to fill in the audit dates and start with an empty item list
+    data["items"] = []
+
     app.logger.info("Processing: %s", data)
     shopcart.deserialize(data)
+    shopcart.created_at = datetime.now()
+    shopcart.last_updated = datetime.now()
 
     # Save the new Shopcart to the database
     shopcart.create()
@@ -97,11 +103,11 @@ def create_shopcarts():
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcarts(shopcart_id):
     """
-    Retrieve a single Account
+    Retrieve a single Shopcart
 
-    This endpoint will return an Account based on it's id
+    This endpoint will return a Shopcart based on it's id
     """
-    app.logger.info("Request for Account with id: %s", shopcart_id)
+    app.logger.info("Request for Shopcart with id: %s", shopcart_id)
 
     # See if the account exists and abort if it doesn't
     shopcart = Shopcart.find(shopcart_id)

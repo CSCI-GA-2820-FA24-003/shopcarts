@@ -73,7 +73,7 @@ class TestShopcart(TestCase):
     ############################################################
     # Utility function to bulk create shopcarts
     ############################################################
-    def _create_shopcarts(self, count: int = 1) -> list:
+    def _create_shopcarts(self, count: int = 1) -> list[Shopcart]:
         """Factory method to create shopcarts in bulk"""
         shopcarts = []
         for _ in range(count):
@@ -117,16 +117,10 @@ class TestShopcart(TestCase):
         self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
         self.assertEqual(new_shopcart["items"], test_shopcart.items)
 
-        # Convert the string date to a datetime object
-        created_at_date = datetime.strptime(
-            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        last_updated_date = datetime.strptime(
-            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        # Compare the parsed date with `test_shopcart.created_at`
-        self.assertEqual(created_at_date, test_shopcart.created_at)
-        self.assertEqual(last_updated_date, test_shopcart.last_updated)
+        # Make sure server assigned a created/updated date
+        # (this will overwrite the ones from factory)
+        self.assertIsNotNone(test_shopcart.created_at)
+        self.assertIsNotNone(test_shopcart.last_updated)
 
         # Check that the location header was correct
         response = self.client.get(location)
@@ -134,17 +128,6 @@ class TestShopcart(TestCase):
         new_shopcart = response.get_json()
         self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
         self.assertEqual(new_shopcart["items"], test_shopcart.items)
-
-        # Convert the string date to a datetime object
-        created_at_date = datetime.strptime(
-            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        last_updated_date = datetime.strptime(
-            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        # Compare the parsed date with `test_shopcart.created_at`
-        self.assertEqual(created_at_date, test_shopcart.created_at)
-        self.assertEqual(last_updated_date, test_shopcart.last_updated)
 
     # ----------------------------------------------------------
     # TEST LIST

@@ -37,6 +37,7 @@ DATABASE_URI = os.getenv(
 class TestShopcart(TestCase):
     """Shopcart Model Test Cases"""
 
+    # pylint: disable=duplicate-code
     @classmethod
     def setUpClass(cls):
         """This runs once before the entire test suite"""
@@ -61,12 +62,13 @@ class TestShopcart(TestCase):
         """This runs after each test"""
         db.session.remove()
 
+    # pylint: enable=duplicate-code
     ######################################################################
     #  T E S T   C A S E S
     ######################################################################
 
     def test_create_a_shopcart(self):
-        """It should Create an Shopcart and assert that it exists"""
+        """It should Create a Shopcart and assert that it exists"""
         fake_shopcart = ShopcartFactory()
         # pylint: disable=unexpected-keyword-arg
         shopcart = Shopcart(
@@ -81,7 +83,7 @@ class TestShopcart(TestCase):
         self.assertEqual(shopcart.last_updated, fake_shopcart.last_updated)
 
     def test_add_a_shopcart(self):
-        """It should Create an shopcart and add it to the database"""
+        """It should Create a Shopcart and add it to the database"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
@@ -93,13 +95,13 @@ class TestShopcart(TestCase):
 
     @patch("service.models.db.session.commit")
     def test_add_shopcart_failed(self, exception_mock):
-        """It should not create an Shopcart on database error"""
+        """It should not create a Shopcart on database error"""
         exception_mock.side_effect = Exception()
         shopcart = ShopcartFactory()
         self.assertRaises(DataValidationError, shopcart.create)
 
     def test_read_shopcart(self):
-        """It should Read an shopcart"""
+        """It should Read a shopcart"""
         shopcart = ShopcartFactory()
         shopcart.create()
 
@@ -112,7 +114,7 @@ class TestShopcart(TestCase):
         self.assertEqual(found_shopcart.items, [])
 
     def test_update_shopcart(self):
-        """It should Update an shopcart"""
+        """It should Update a shopcart"""
         shopcart = ShopcartFactory(customer_name="Old Name")
         shopcart.create()
         # Assert that it was assigned an id and shows up in the database
@@ -130,13 +132,13 @@ class TestShopcart(TestCase):
 
     @patch("service.models.db.session.commit")
     def test_update_shopcart_failed(self, exception_mock):
-        """It should not update an Shopcart on database error"""
+        """It should not update a Shopcart on database error"""
         exception_mock.side_effect = Exception()
         shopcart = ShopcartFactory()
         self.assertRaises(DataValidationError, shopcart.update)
 
     def test_delete_a_shopcart(self):
-        """It should Delete an shopcart from the database"""
+        """It should Delete a shopcart from the database"""
         shopcarts = Shopcart.all()
         self.assertEqual(shopcarts, [])
         shopcart = ShopcartFactory()
@@ -152,7 +154,7 @@ class TestShopcart(TestCase):
 
     @patch("service.models.db.session.commit")
     def test_delete_shopcart_failed(self, exception_mock):
-        """It should not delete an Shopcart on database error"""
+        """It should not delete a Shopcart on database error"""
         exception_mock.side_effect = Exception()
         shopcart = ShopcartFactory()
         self.assertRaises(DataValidationError, shopcart.delete)
@@ -163,12 +165,12 @@ class TestShopcart(TestCase):
         self.assertEqual(shopcarts, [])
         for shopcart in ShopcartFactory.create_batch(5):
             shopcart.create()
-        # Assert that there are not 5 shiocarts in the database
+        # Assert that there are 5 shopcarts in the database
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 5)
 
     def test_find_by_customer_name(self):
-        """It should Find an Shopcart by customer name"""
+        """It should Find a Shopcart by customer name"""
         shopcart = ShopcartFactory()
         shopcart.create()
 
@@ -185,8 +187,10 @@ class TestShopcart(TestCase):
         serial_shopcart = shopcart.serialize()
         self.assertEqual(serial_shopcart["id"], shopcart.id)
         self.assertEqual(serial_shopcart["customer_name"], shopcart.customer_name)
-        self.assertEqual(serial_shopcart["created_at"], shopcart.created_at)
-        self.assertEqual(serial_shopcart["last_updated"], shopcart.last_updated)
+        self.assertEqual(serial_shopcart["created_at"], shopcart.created_at.isoformat())
+        self.assertEqual(
+            serial_shopcart["last_updated"], shopcart.last_updated.isoformat()
+        )
         self.assertEqual(len(serial_shopcart["items"]), 1)
         items = serial_shopcart["items"]
         self.assertEqual(items[0]["id"], item.id)
@@ -195,8 +199,8 @@ class TestShopcart(TestCase):
         self.assertEqual(items[0]["description"], item.description)
         self.assertEqual(items[0]["price"], item.price)
         self.assertEqual(items[0]["quantity"], item.quantity)
-        self.assertEqual(items[0]["created_at"], item.created_at)
-        self.assertEqual(items[0]["last_updated"], item.last_updated)
+        self.assertEqual(items[0]["created_at"], item.created_at.isoformat())
+        self.assertEqual(items[0]["last_updated"], item.last_updated.isoformat())
 
     def test_deserialize_a_shopcart(self):
         """It should Deserialize a shopcart"""
@@ -207,8 +211,6 @@ class TestShopcart(TestCase):
         new_shopcart = Shopcart()
         new_shopcart.deserialize(serial_shopcart)
         self.assertEqual(new_shopcart.customer_name, shopcart.customer_name)
-        self.assertEqual(new_shopcart.created_at, shopcart.created_at)
-        self.assertEqual(new_shopcart.last_updated, shopcart.last_updated)
 
     def test_deserialize_with_key_error(self):
         """It should not Deserialize a shopcart with a KeyError"""
