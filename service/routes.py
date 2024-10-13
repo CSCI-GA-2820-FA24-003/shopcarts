@@ -84,7 +84,7 @@ def create_shopcarts():
 
     # Return the location of the new Shopcart
     location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
-    # location_url = "unknown"
+
     return (
         jsonify(shopcart.serialize()),
         status.HTTP_201_CREATED,
@@ -137,7 +137,10 @@ def update_shopcarts(shopcart_id):
         )
 
     # Update from the json in the body of the request
-    shopcart.deserialize(request.get_json())
+    updated_json = request.get_json()
+    if "items" not in updated_json:
+        updated_json["items"] = shopcart.item.serialize()
+    shopcart.deserialize(updated_json)
     shopcart.id = shopcart_id
     shopcart.last_updated = datetime.now()
     shopcart.update()
