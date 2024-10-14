@@ -251,7 +251,7 @@ def list_items(shopcart_id):
 # READ A ITEM FROM A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["GET"])
-def get_items(shopcart_id, item_id):
+def get_items(shopcart_id, item_id):  # pylint: disable=unused-argument
     """
     Retrieve a single Item
 
