@@ -186,6 +186,13 @@ class TestShopcart(TestCase):
         resp = self.client.delete(f"{BASE_URL}/{shopcart.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
+    def test_delete_non_existing_shopcart(self):
+        """It should Delete a Shopcart even if it doesn't exist"""
+        # Attempt to delete a non-existing shopcart
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
     # ----------------------------------------------------------
     # TEST LIST
     # ----------------------------------------------------------
@@ -321,3 +328,32 @@ class TestShopcart(TestCase):
         data = response.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("was not found", data["message"])
+
+    def test_delete_item(self):
+        """It should Delete a Item"""
+        # Create a shopcart and add an item to it
+        test_shopcart = self._create_shopcarts(1)[0]
+        test_item = self._create_items(test_shopcart.id, 1)[0]
+
+        # Delete the item
+        response = self.client.delete(
+            f"{BASE_URL}/{test_shopcart.id}/items/{test_item.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+
+        # Verify the item is actually deleted
+        response = self.client.get(
+            f"{BASE_URL}/{test_shopcart.id}/items/{test_item.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_non_existing_item(self):
+        """It should Delete a Item even if it doesn't exist"""
+        # Create a shopcart without items
+        shopcart = self._create_shopcarts(1)[0]
+
+        # Attempt to delete a non-existing item
+        response = self.client.delete(f"{BASE_URL}/{shopcart.id}/items/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
