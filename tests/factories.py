@@ -4,7 +4,7 @@ Test Factory to make fake objects for testing
 
 from datetime import datetime, UTC
 from factory import Factory, SubFactory, Sequence, Faker, post_generation
-from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyDecimal, FuzzyInteger
+from factory.fuzzy import FuzzyChoice, FuzzyDateTime, FuzzyInteger
 from service.models import Shopcart, Item
 
 
