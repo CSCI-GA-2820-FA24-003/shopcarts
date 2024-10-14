@@ -316,7 +316,7 @@ class TestShopcart(TestCase):
         self.assertEqual(data["name"], test_item.name)
 
     def test_get_item_not_found(self):
-        """It should not Get a Item thats not found"""
+        """It should not Get an Item thats not found"""
         # Create a shopcart but do not add items
         shopcart = self._create_shopcarts(1)[0]
 
@@ -330,7 +330,7 @@ class TestShopcart(TestCase):
         self.assertIn("was not found", data["message"])
 
     def test_delete_item(self):
-        """It should Delete a Item"""
+        """It should Delete an Item"""
         # Create a shopcart and add an item to it
         test_shopcart = self._create_shopcarts(1)[0]
         test_item = self._create_items(test_shopcart.id, 1)[0]
@@ -349,7 +349,7 @@ class TestShopcart(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_non_existing_item(self):
-        """It should Delete a Item even if it doesn't exist"""
+        """It should Delete an Item even if it doesn't exist"""
         # Create a shopcart without items
         shopcart = self._create_shopcarts(1)[0]
 
