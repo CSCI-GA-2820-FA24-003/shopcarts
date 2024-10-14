@@ -214,12 +214,10 @@ def create_items(shopcart_id):
     # Prepare a message to return
     message = item.serialize()
 
-    # TODO: uncomment when get_items is implemented
-    # # Send the location to GET the new item
-    # location_url = url_for(
-    #     "get_items", shopcart_id=shopcart.id, item_id=item.id, _external=True
-    # )
-    location_url = "unknown"
+    # Send the location to GET the new item
+    location_url = url_for(
+        "get_items", shopcart_id=shopcart.id, item_id=item.id, _external=True
+    )
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
@@ -227,7 +225,7 @@ def create_items(shopcart_id):
 # RETRIEVE ALL ITEMS FROM A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
-def get_items(shopcart_id):
+def list_items(shopcart_id):
     """
     Retrieve all Items from a Shopcart
 
@@ -247,6 +245,27 @@ def get_items(shopcart_id):
     items = [item.serialize() for item in shopcart.items]
     app.logger.info("Returning %d items", len(items))
     return jsonify(items), status.HTTP_200_OK
+
+
+######################################################################
+# READ A ITEM FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["GET"])
+def get_items(shopcart_id, item_id):  # pylint: disable=unused-argument
+    """
+    Retrieve a single Item
+
+    This endpoint will return a Item based on it's id
+    """
+    app.logger.info("Request to Retrieve a item with id [%s]", item_id)
+
+    # Attempt to find the Item and abort if not found
+    item = Item.find(item_id)
+    if not item:
+        abort(status.HTTP_404_NOT_FOUND, f"Item with id '{item_id}' was not found.")
+
+    app.logger.info("Returning item: %s", item.name)
+    return jsonify(item.serialize()), status.HTTP_200_OK
 
 
 # ---------------------------------------------------------------------
