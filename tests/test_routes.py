@@ -95,13 +95,14 @@ class TestShopcart(TestCase):
 
     def _create_items(self, shopcart_id, number_of_items):
         """Helper method to create items for a shopcart"""
+        items = []
         for _ in range(number_of_items):
-            item = (
+            test_item = (
                 ItemFactory()
             )  # Assuming you have ItemFactory to generate item instances
             response = self.client.post(
                 f"{BASE_URL}/{shopcart_id}/items",
-                json=item.serialize(),
+                json=test_item.serialize(),
                 content_type="application/json",
             )
             self.assertEqual(
@@ -109,6 +110,10 @@ class TestShopcart(TestCase):
                 status.HTTP_201_CREATED,
                 "Could not create test item",
             )
+            new_item = response.get_json()
+            test_item.id = new_item["id"]
+            items.append(test_item)
+        return items
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -288,3 +293,32 @@ class TestShopcart(TestCase):
             f"Shopcart with id '{shopcart.id}' could not be found.",
             resp.get_json()["message"],
         )
+
+    def test_get_item(self):
+        """It should Get a single Item from a shopcart"""
+        # Create a shopcart and add an item to it
+        shopcart = self._create_shopcarts(1)[0]
+        test_item = self._create_items(shopcart.id, 1)[0]
+
+        # Retrieve the item by its ID
+        item_id = test_item.id
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}/items/{item_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the item data matches the created item
+        data = response.get_json()
+        self.assertEqual(data["name"], test_item.name)
+
+    def test_get_item_not_found(self):
+        """It should not Get a Item thats not found"""
+        # Create a shopcart but do not add items
+        shopcart = self._create_shopcarts(1)[0]
+
+        # Try to retrieve a non-existent item (using ID 0)
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}/items/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        # Check that the error message is correct
+        data = response.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("was not found", data["message"])
