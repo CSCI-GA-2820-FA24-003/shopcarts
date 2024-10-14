@@ -30,13 +30,15 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    """Root URL response"""
-    return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
-    )
+    """Root URL response with microservice details"""
+    response_data = {
+        "name": "Shopcart Microservice",  # 填写你的微服务名称
+        "version": "1.0.0",  # 填写你的微服务版本号
+        "list_url": "/shopcarts",  # 资源列表的 URL，假设是 /shopcarts
+    }
+    return jsonify(response_data), status.HTTP_200_OK
 
 
 ######################################################################

@@ -171,3 +171,109 @@ class TestShopcart(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("Shopcart with id '0' could not be found.", data["message"])
+
+
+import unittest
+from unittest.mock import patch
+from service import app
+from flask import json
+
+
+class TestErrorHandlers(unittest.TestCase):
+
+    def setUp(self):
+        """Runs before each test"""
+        self.app = app.test_client()
+        self.app.testing = True
+
+    def test_bad_request_error(self):
+        """It should return 400 for bad requests"""
+        response = self.app.post(
+            "/shopcarts",
+            json={},  # 传入无效的空数据，导致数据验证错误
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_not_found_error(self):
+        """It should return 404 for a non-existing resource"""
+        response = self.app.get("/shopcarts/0")  # 试图获取不存在的shopcart
+        self.assertEqual(response.status_code, 404)
+
+    def test_method_not_allowed_error(self):
+        """It should return 405 when using an unsupported method"""
+        response = self.app.put("/shopcarts", json={})
+        self.assertEqual(response.status_code, 405)
+
+    def test_unsupported_media_type_error(self):
+        """It should return 415 for unsupported media types"""
+        response = self.app.post(
+            "/shopcarts",
+            data="invalid data",  # 发送不支持的数据类型
+            content_type="text/plain",
+        )
+        self.assertEqual(response.status_code, 415)
+
+    @patch("service.models.Shopcart.find")
+    def test_internal_server_error(self, mock_find):
+        """It should return 500 for internal server error"""
+        mock_find.side_effect = Exception("Database error")  # 模拟一个服务器内部错误
+        response = self.app.get("/shopcarts/1")
+        self.assertEqual(response.status_code, 500)
+
+
+def test_bad_request_error(self):
+    """It should return 400 for bad requests"""
+    response = self.client.post(
+        "/shopcarts",
+        json={},  # 传入无效的空数据，导致数据验证错误
+        content_type="application/json",
+    )
+    self.assertEqual(response.status_code, 400)
+
+
+def test_not_found_error(self):
+    """It should return 404 for a non-existing resource"""
+    response = self.client.get("/shopcarts/0")  # 试图获取不存在的 shopcart
+    self.assertEqual(response.status_code, 404)
+
+
+def test_method_not_allowed_error(self):
+    """It should return 405 when using an unsupported method"""
+    response = self.client.put("/shopcarts", json={})
+    self.assertEqual(response.status_code, 405)
+
+
+def test_unsupported_media_type_error(self):
+    """It should return 415 for unsupported media types"""
+    response = self.client.post(
+        "/shopcarts",
+        data="invalid data",  # 发送不支持的数据类型
+        content_type="text/plain",
+    )
+    self.assertEqual(response.status_code, 415)
+
+
+@patch("service.models.Shopcart.find")
+def test_internal_server_error(self, mock_find):
+    """It should return 500 for internal server error"""
+    mock_find.side_effect = Exception("Database error")  # 模拟一个服务器内部错误
+    response = self.client.get("/shopcarts/1")
+    self.assertEqual(response.status_code, 500)
+
+
+def test_root_url(self):
+    """It should return useful information at the root URL"""
+    response = self.client.get("/")
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # Check if the response contains name, version, and list_resource_url
+    data = response.get_json()
+    self.assertIn("name", data)
+    self.assertIn("version", data)
+    self.assertIn("list_resource_url", data)
+
+    # Optional: You can check the exact values if needed
+    self.assertEqual(data["name"], "Shopcart API Service")
+    self.assertEqual(data["version"], "1.0.0")
+    self.assertEqual(data["list_resource_url"], "/shopcarts")
