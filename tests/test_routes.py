@@ -265,12 +265,11 @@ class TestShopcart(TestCase):
         self.assertIsNotNone(item.created_at)
         self.assertIsNotNone(item.last_updated)
 
-        # TODO: uncomment when get_items is implemented
-        # # Check that the location header was correct by getting it
-        # resp = self.client.get(location, content_type="application/json")
-        # self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        # new_address = resp.get_json()
-        # self.assertEqual(new_address["name"], address.name, "Address name does not match")
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_item = resp.get_json()
+        self.assertEqual(new_item["name"], item.name, "Item name does not match")
 
     def test_list_all_items_in_shopcart(self):
         """It should return a list of all Items in a Shopcart"""

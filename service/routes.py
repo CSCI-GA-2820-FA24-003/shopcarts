@@ -214,12 +214,10 @@ def create_items(shopcart_id):
     # Prepare a message to return
     message = item.serialize()
 
-    # TODO: uncomment when get_items is implemented
-    # # Send the location to GET the new item
-    # location_url = url_for(
-    #     "get_items", shopcart_id=shopcart.id, item_id=item.id, _external=True
-    # )
-    location_url = "unknown"
+    # Send the location to GET the new item
+    location_url = url_for(
+        "get_items", shopcart_id=shopcart.id, item_id=item.id, _external=True
+    )
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
