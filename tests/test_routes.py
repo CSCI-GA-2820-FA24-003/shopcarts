@@ -89,6 +89,27 @@ class TestShopcart(TestCase):
             shopcarts.append(test_shopcart)
         return shopcarts
 
+    ############################################################
+    # Utility function to create items in shopcarts
+    ############################################################
+
+    def _create_items(self, shopcart_id, number_of_items):
+        """Helper method to create items for a shopcart"""
+        for _ in range(number_of_items):
+            item = (
+                ItemFactory()
+            )  # Assuming you have ItemFactory to generate item instances
+            response = self.client.post(
+                f"{BASE_URL}/{shopcart_id}/items",
+                json=item.serialize(),
+                content_type="application/json",
+            )
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test item",
+            )
+
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
@@ -245,3 +266,25 @@ class TestShopcart(TestCase):
         # self.assertEqual(resp.status_code, status.HTTP_200_OK)
         # new_address = resp.get_json()
         # self.assertEqual(new_address["name"], address.name, "Address name does not match")
+
+    def test_list_all_items_in_shopcart(self):
+        """It should return a list of all Items in a Shopcart"""
+        # Create a shopcart with items
+        shopcart = self._create_shopcarts(1)[0]
+        self._create_items(shopcart.id, 2)
+
+        # List all items
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 2)
+
+    def test_list_all_items_in_shopcart_when_shopcart_not_found(self):
+        """It should not list all Items in a Shopcart that's not found"""
+        shopcart = ShopcartFactory()
+        resp = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn(
+            f"Shopcart with id '{shopcart.id}' could not be found.",
+            resp.get_json()["message"],
+        )
