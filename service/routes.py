@@ -248,24 +248,65 @@ def list_items(shopcart_id):
 
 
 ######################################################################
-# READ A ITEM FROM A SHOPCART
+# READ AN ITEM FROM A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["GET"])
 def get_items(shopcart_id, item_id):  # pylint: disable=unused-argument
     """
     Retrieve a single Item
 
-    This endpoint will return a Item based on it's id
+    This endpoint will return an Item based on it's id
     """
-    app.logger.info("Request to Retrieve a item with id [%s]", item_id)
+    app.logger.info("Request to Retrieve an item with id [%s]", item_id)
 
-    # Attempt to find the Item and abort if not found
-    item = Item.find(item_id)
+    # Find the shopcart first
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' was not found.",
+        )
+
+    # Find the item within the specified shopcart
+    item = next((item for item in shopcart.items if item.id == item_id), None)
     if not item:
-        abort(status.HTTP_404_NOT_FOUND, f"Item with id '{item_id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' was not found in shopcart '{shopcart_id}'.",
+        )
 
     app.logger.info("Returning item: %s", item.name)
     return jsonify(item.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+# DELETE AN ITEM FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_items(shopcart_id, item_id):
+    """
+    Delete an Item
+
+    This endpoint will delete an Item based the id specified in the path
+    """
+    app.logger.info("Request to Delete an item with id [%s]", item_id)
+
+    # Find the shopcart first
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+
+    # Delete the Item if it exists
+    item = Item.find(item_id)
+    if item:
+        app.logger.info("Item with ID: %d found.", item.id)
+        item.delete()
+
+    app.logger.info("Item with ID: %d delete complete.", item_id)
+    return {}, status.HTTP_204_NO_CONTENT
 
 
 # ---------------------------------------------------------------------
