@@ -33,10 +33,12 @@ from service.common import status  # HTTP Status Codes
 @app.route("/", methods=["GET"])
 def index():
     """Root URL response with microservice details"""
+    
+    app.logger.info("Request for Root URL")
     response_data = {
         "name": "Shopcart Microservice",  # 填写你的微服务名称
         "version": "1.0.0",  # 填写你的微服务版本号
-        "list_url": "/shopcarts",  # 资源列表的 URL，假设是 /shopcarts
+        "list_url": url_for("list_shopcarts", _external=True),
     }
     return jsonify(response_data), status.HTTP_200_OK
 
