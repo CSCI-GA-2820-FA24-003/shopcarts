@@ -109,7 +109,7 @@ def get_shopcarts(shopcart_id):
     """
     app.logger.info("Request for Shopcart with id: %s", shopcart_id)
 
-    # See if the account exists and abort if it doesn't
+    # See if the shopcart exists and abort if it doesn't
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
