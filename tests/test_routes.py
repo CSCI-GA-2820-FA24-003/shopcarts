@@ -169,13 +169,15 @@ class TestShopcart(TestCase):
         new_shopcart = resp.get_json()
         old_updated_time = test_shopcart.last_updated
         new_shopcart["customer_name"] = "New name"
-        new_account_id = new_shopcart["id"]
-        resp = self.client.put(f"{BASE_URL}/{new_account_id}", json=new_shopcart)
+        new_shopcart_id = new_shopcart["id"]
+        resp = self.client.put(f"{BASE_URL}/{new_shopcart_id}", json=new_shopcart)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        updated_account = resp.get_json()
-        self.assertEqual(updated_account["customer_name"], "New name")
+        updated_shopcart = resp.get_json()
+        self.assertEqual(updated_shopcart["customer_name"], "New name")
         self.assertGreater(
-            datetime.fromisoformat(updated_account["last_updated"]).replace(tzinfo=UTC),
+            datetime.fromisoformat(updated_shopcart["last_updated"]).replace(
+                tzinfo=UTC
+            ),
             old_updated_time,
         )
 
@@ -328,6 +330,48 @@ class TestShopcart(TestCase):
         data = response.get_json()
         logging.debug("Response data = %s", data)
         self.assertIn("could not be found", data["message"])
+
+    def test_update_item(self):
+        """It should Update an item in a shopcart"""
+        # create a known item
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        old_updated_time = item.last_updated
+        item_id = data["id"]
+        data["name"] = "XXXX"
+
+        # send the update back
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart.id}/items/{item_id}",
+            json=data,
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # retrieve it back
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/items/{item_id}",
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        updated_item = resp.get_json()
+
+        self.assertEqual(data["id"], item_id)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["name"], "XXXX")
+        self.assertGreater(
+            datetime.fromisoformat(updated_item["last_updated"]).replace(tzinfo=UTC),
+            old_updated_time,
+        )
 
     def test_delete_item(self):
         """It should Delete an Item"""
