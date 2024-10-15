@@ -327,7 +327,7 @@ class TestShopcart(TestCase):
         # Check that the error message is correct
         data = response.get_json()
         logging.debug("Response data = %s", data)
-        self.assertIn("was not found", data["message"])
+        self.assertIn("could not be found", data["message"])
 
     def test_delete_item(self):
         """It should Delete an Item"""

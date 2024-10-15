@@ -257,22 +257,16 @@ def get_items(shopcart_id, item_id):  # pylint: disable=unused-argument
 
     This endpoint will return an Item based on it's id
     """
-    app.logger.info("Request to Retrieve an item with id [%s]", item_id)
+    app.logger.info(
+        "Request to Retrieve an item [%s] for Shopcart id: %s", (item_id, shopcart_id)
+    )
 
-    # Find the shopcart first
-    shopcart = Shopcart.find(shopcart_id)
-    if not shopcart:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{shopcart_id}' was not found.",
-        )
-
-    # Find the item within the specified shopcart
-    item = next((item for item in shopcart.items if item.id == item_id), None)
+    # Attempt to find the Item and abort if not found
+    item = Item.find(item_id)
     if not item:
         abort(
             status.HTTP_404_NOT_FOUND,
-            f"Item with id '{item_id}' was not found in shopcart '{shopcart_id}'.",
+            f"Item with id '{item_id}' could not be found.",
         )
 
     app.logger.info("Returning item: %s", item.name)
@@ -289,24 +283,16 @@ def delete_items(shopcart_id, item_id):
 
     This endpoint will delete an Item based the id specified in the path
     """
-    app.logger.info("Request to Delete an item with id [%s]", item_id)
+    app.logger.info(
+        "Request to Delete an item[%s] for Shopcart id: %s", (item_id, shopcart_id)
+    )
 
-    # Find the shopcart first
-    shopcart = Shopcart.find(shopcart_id)
-    if not shopcart:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{shopcart_id}' could not be found.",
-        )
-
-    # Delete the Item if it exists
+    # Attempt to find the Item and delete it if it exists
     item = Item.find(item_id)
     if item:
-        app.logger.info("Item with ID: %d found.", item.id)
         item.delete()
 
-    app.logger.info("Item with ID: %d delete complete.", item_id)
-    return {}, status.HTTP_204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
 
 
 # ---------------------------------------------------------------------
