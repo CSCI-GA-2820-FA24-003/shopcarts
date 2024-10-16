@@ -41,15 +41,21 @@ tests/                          - test cases package
 
 ## API Endpoints
 
-The shopcarts service currently provides the following API endpoints in Sprint 1:
+The shopcarts service currently provides the following API endpoints:
 
-| Operation                         | Method | URL                                          |
-|-----------------------------------|--------|----------------------------------------------|
-| **Create a new shopcart**         | POST   | `/api/shopcarts`                                 |
-| **Get a shopcart**                | GET    | `/api/shopcarts/{shopcart_id}`                   |
-| **Delete a shopcart**             | DELETE | `/api/shopcarts/{shopcart_id}`                   |
-| **Add an item to a shopcart**     | POST   | `/api/shopcarts/{shopcart_id}/items`             |
-| **List all items in a shopcart**  | GET    | `/api/shopcarts/{shopcart_id}/items`             |
+| Method | URL                                          | Operation                                   |
+|--------|----------------------------------------------|---------------------------------------------|
+| GET    | `/`                                          | Return some JSON about the service          |
+| GET    | `/shopcarts`                                 | List all shopcarts                          |
+| POST   | `/shopcarts`                                 | Create a new shopcart                       |
+| GET    | `/shopcarts/{id}`                            | Read a shopcart                             |
+| PUT    | `/shopcarts/{id}`                            | Update a shopcart                           |
+| DELETE | `/shopcarts/{id}`                            | Delete a shopcart                           |
+| GET    | `/shopcarts/{id}/items`                      | List all items in a shopcart                |
+| POST   | `/shopcarts/{id}/items`                      | Create a new item in a shopcart             |
+| GET    | `/shopcarts/{id}/items/{item_id}`            | Read an item from a shopcart                |
+| PUT    | `/shopcarts/{id}/items/{item_id}`            | Update an item in a shopcart                |
+| DELETE | `/shopcarts/{id}/items/{item_id}`            | Delete an item from a shopcart              |
 
 ### Root Route
 The root route `/` returns information about the service, including its name and version in JSON format.
