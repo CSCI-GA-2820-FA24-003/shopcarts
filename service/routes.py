@@ -113,7 +113,7 @@ def get_shopcarts(shopcart_id):
     """
     app.logger.info("Request for Shopcart with id: %s", shopcart_id)
 
-    # See if the account exists and abort if it doesn't
+    # See if the shopcart exists and abort if it doesn't
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
@@ -274,6 +274,38 @@ def get_items(shopcart_id, item_id):  # pylint: disable=unused-argument
         )
 
     app.logger.info("Returning item: %s", item.name)
+    return jsonify(item.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+# UPDATE AN ITEM FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["PUT"])
+def update_items(shopcart_id, item_id):
+    """
+    Update an Item
+
+    This endpoint will update an Item based on the body that is posted
+    """
+    app.logger.info(
+        "Request to update Item %s for Shopcart id: %s", (item_id, shopcart_id)
+    )
+    check_content_type("application/json")
+
+    # See if the item exists and abort if it doesn't
+    item = Item.find(item_id)
+    if not item:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' could not be found.",
+        )
+
+    # Update from the json in the body of the request
+    item.deserialize(request.get_json())
+    item.id = item_id
+    item.last_updated = datetime.now()
+    item.update()
+
     return jsonify(item.serialize()), status.HTTP_200_OK
 
 
