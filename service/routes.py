@@ -34,7 +34,7 @@ from service.common import status  # HTTP Status Codes
 @app.route("/", methods=["GET"])
 def index():
     """Root URL response with microservice details"""
-    
+
     app.logger.info("Request for Root URL")
     response_data = {
         "name": "Shopcart Microservice",
