@@ -31,13 +31,17 @@ from service.common import status  # HTTP Status Codes
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
-    """Root URL response"""
-    return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
-    )
+    """Root URL response with microservice details"""
+    
+    app.logger.info("Request for Root URL")
+    response_data = {
+        "name": "Shopcart Microservice",
+        "version": "1.0.0",
+        "paths": url_for("list_shopcarts", _external=True),
+    }
+    return jsonify(response_data), status.HTTP_200_OK
 
 
 ######################################################################
