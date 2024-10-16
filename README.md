@@ -1,31 +1,14 @@
-# NYU DevOps Project Template
+
+# NYU DevOps Project - Shopcarts
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
-
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This project implements the shopcarts service, which allows customers to manage a collection of products they want to purchase. The service includes a REST API that provides CRUD operations for managing shopcarts and the items within them.
 
-## Automatic Setup
-
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
-
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
-
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
-```
+In Sprint 1, we are following Test Driven Development (TDD) practices to create and test the models and service routes for the shopcarts resource.
 
 ## Contents
 
@@ -33,30 +16,67 @@ The project contains the following:
 
 ```text
 .gitignore          - this will ignore vagrant and other metadata files
+.gitattributes      - File to fix Windows CRLF issues
 .flaskenv           - Environment variables to configure Flask
-.gitattributes      - File to gix Windows CRLF issues
-.devcontainers/     - Folder with support for VSCode Remote Containers
-dot-env-example     - copy to .env to use environment variables
-pyproject.toml      - Poetry list of Python libraries required by your code
+Dockerfile          - Docker configuration file
+pyproject.toml      - Poetry list of Python libraries required
 
-service/                   - service python package
-├── __init__.py            - package initializer
-├── config.py              - configuration parameters
-├── models.py              - module with business models
-├── routes.py              - module with service routes
-└── common                 - common code package
-    ├── cli_commands.py    - Flask command to recreate all tables
-    ├── error_handlers.py  - HTTP error handling code
-    ├── log_handlers.py    - logging setup code
-    └── status.py          - HTTP status constants
+service/                        - service python package
+├── __init__.py                 - package initializer
+├── config.py                   - configuration parameters
+├── models.py                   - model for shopcarts and items
+├── routes.py                   - module with service routes
+├── common                      - common code package
+│   ├── cli_commands.py         - Flask command to recreate all tables
+│   ├── error_handlers.py       - HTTP error handling code
+│   ├── log_handlers.py         - logging setup code
+│   └── status.py               - HTTP status constants
 
-tests/                     - test cases package
-├── __init__.py            - package initializer
-├── factories.py           - Factory for testing with fake objects
-├── test_cli_commands.py   - test suite for the CLI
-├── test_models.py         - test suite for business models
-└── test_routes.py         - test suite for service routes
+tests/                          - test cases package
+├── __init__.py                 - package initializer
+├── factories.py                - Factory for testing with fake objects
+├── test_models.py              - test suite for business models
+└── test_routes.py              - test suite for service routes
 ```
+
+## API Endpoints
+
+The shopcarts service currently provides the following API endpoints in Sprint 1:
+
+| Operation                         | Method | URL                                          |
+|-----------------------------------|--------|----------------------------------------------|
+| **Create a new shopcart**         | POST   | `/api/shopcarts`                                 |
+| **Get a shopcart**                | GET    | `/api/shopcarts/{shopcart_id}`                   |
+| **Delete a shopcart**             | DELETE | `/api/shopcarts/{shopcart_id}`                   |
+| **Add an item to a shopcart**     | POST   | `/api/shopcarts/{shopcart_id}/items`             |
+| **List all items in a shopcart**  | GET    | `/api/shopcarts/{shopcart_id}/items`             |
+
+### Root Route
+The root route `/` returns information about the service, including its name and version in JSON format.
+
+## Running the Tests
+
+To run the tests for this project, use the following command:
+
+```bash
+make test
+```
+
+This command will run the test suite using `pytest` to ensure that all the tests pass.
+
+## Running the Service Locally
+
+To run the shopcarts service locally, use the following command:
+
+```bash
+honcho start
+```
+
+The service will start and be accessible at `http://localhost:8080`.
+
+## Coding Standards
+
+Make sure that your code conforms to the PEP8 Python standard by using `pylint`. The `make lint` command can be used to run pylint and check for compliance.
 
 ## License
 
