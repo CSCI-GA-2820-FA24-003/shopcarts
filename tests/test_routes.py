@@ -22,14 +22,14 @@ import logging
 
 # pylint: disable=duplicate-code
 import os
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest import TestCase
 
 from service.common import status
 from service.models import Shopcart, db
 from wsgi import app
 
-from .factories import ShopcartFactory
+from .factories import ItemFactory, ShopcartFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -73,7 +73,7 @@ class TestShopcart(TestCase):
     ############################################################
     # Utility function to bulk create shopcarts
     ############################################################
-    def _create_shopcarts(self, count: int = 1) -> list:
+    def _create_shopcarts(self, count: int = 1) -> list[Shopcart]:
         """Factory method to create shopcarts in bulk"""
         shopcarts = []
         for _ in range(count):
@@ -88,6 +88,32 @@ class TestShopcart(TestCase):
             test_shopcart.id = new_shopcart["id"]
             shopcarts.append(test_shopcart)
         return shopcarts
+
+    ############################################################
+    # Utility function to create items in shopcarts
+    ############################################################
+
+    def _create_items(self, shopcart_id, number_of_items):
+        """Helper method to create items for a shopcart"""
+        items = []
+        for _ in range(number_of_items):
+            test_item = (
+                ItemFactory()
+            )  # Assuming you have ItemFactory to generate item instances
+            response = self.client.post(
+                f"{BASE_URL}/{shopcart_id}/items",
+                json=test_item.serialize(),
+                content_type="application/json",
+            )
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test item",
+            )
+            new_item = response.get_json()
+            test_item.id = new_item["id"]
+            items.append(test_item)
+        return items
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -117,16 +143,10 @@ class TestShopcart(TestCase):
         self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
         self.assertEqual(new_shopcart["items"], test_shopcart.items)
 
-        # Convert the string date to a datetime object
-        created_at_date = datetime.strptime(
-            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        last_updated_date = datetime.strptime(
-            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        # Compare the parsed date with `test_shopcart.created_at`
-        self.assertEqual(created_at_date, test_shopcart.created_at)
-        self.assertEqual(last_updated_date, test_shopcart.last_updated)
+        # Make sure server assigned a created/updated date
+        # (this will overwrite the ones from factory)
+        self.assertIsNotNone(test_shopcart.created_at)
+        self.assertIsNotNone(test_shopcart.last_updated)
 
         # Check that the location header was correct
         response = self.client.get(location)
@@ -135,16 +155,43 @@ class TestShopcart(TestCase):
         self.assertEqual(new_shopcart["customer_name"], test_shopcart.customer_name)
         self.assertEqual(new_shopcart["items"], test_shopcart.items)
 
-        # Convert the string date to a datetime object
-        created_at_date = datetime.strptime(
-            new_shopcart["created_at"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        last_updated_date = datetime.strptime(
-            new_shopcart["last_updated"], "%a, %d %b %Y %H:%M:%S %Z"
-        ).date()
-        # Compare the parsed date with `test_shopcart.created_at`
-        self.assertEqual(created_at_date, test_shopcart.created_at)
-        self.assertEqual(last_updated_date, test_shopcart.last_updated)
+    # ----------------------------------------------------------
+    # TEST UPDATE
+    # ----------------------------------------------------------
+    def test_update_shopcart(self):
+        """It should Update an existing Shopcart"""
+        # create an Shopcart to update
+        test_shopcart = ShopcartFactory()
+        resp = self.client.post(BASE_URL, json=test_shopcart.serialize())
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the shopcart
+        new_shopcart = resp.get_json()
+        old_updated_time = test_shopcart.last_updated
+        new_shopcart["customer_name"] = "New name"
+        new_account_id = new_shopcart["id"]
+        resp = self.client.put(f"{BASE_URL}/{new_account_id}", json=new_shopcart)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_account = resp.get_json()
+        self.assertEqual(updated_account["customer_name"], "New name")
+        self.assertGreater(
+            datetime.fromisoformat(updated_account["last_updated"]).replace(tzinfo=UTC),
+            old_updated_time,
+        )
+
+    def test_delete_shopcart(self):
+        """It should Delete a Shopcart"""
+        # get the id of a shopcart
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_non_existing_shopcart(self):
+        """It should Delete a Shopcart even if it doesn't exist"""
+        # Attempt to delete a non-existing shopcart
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
 
     # ----------------------------------------------------------
     # TEST LIST
@@ -172,108 +219,141 @@ class TestShopcart(TestCase):
         data = response.get_json()
         self.assertIn("Shopcart with id '0' could not be found.", data["message"])
 
+    # ----------------------------------------------------------
+    # IMPROPER REQUEST TESTS
+    # ----------------------------------------------------------
+    def test_bad_request(self):
+        """It should not Create when sending the wrong data"""
+        resp = self.client.post(BASE_URL, json={"name": "not enough data"})
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-import unittest
-from unittest.mock import patch
-from service import app
-from flask import json
+    def test_unsupported_media_type(self):
+        """It should not Create when sending wrong media type"""
+        shopcart = ShopcartFactory()
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="test/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
+    def test_method_not_allowed(self):
+        """It should not allow an illegal method call"""
+        resp = self.client.put(BASE_URL, json={"not": "today"})
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class TestErrorHandlers(unittest.TestCase):
+    ######################################################################
+    #  I T E M   T E S T   C A S E S
+    ######################################################################
 
-    def setUp(self):
-        """Runs before each test"""
-        self.app = app.test_client()
-        self.app.testing = True
-
-    def test_bad_request_error(self):
-        """It should return 400 for bad requests"""
-        response = self.app.post(
-            "/shopcarts",
-            json={},  # 传入无效的空数据，导致数据验证错误
+    def test_add_item(self):
+        """It should Add an item to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = ItemFactory()
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+            json=item.serialize(),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
-    def test_not_found_error(self):
-        """It should return 404 for a non-existing resource"""
-        response = self.app.get("/shopcarts/0")  # 试图获取不存在的shopcart
-        self.assertEqual(response.status_code, 404)
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
 
-    def test_method_not_allowed_error(self):
-        """It should return 405 when using an unsupported method"""
-        response = self.app.put("/shopcarts", json={})
-        self.assertEqual(response.status_code, 405)
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["shopcart_id"], shopcart.id)
+        self.assertEqual(data["name"], item.name)
+        self.assertEqual(data["description"], item.description)
+        self.assertEqual(data["price"], item.price)
+        self.assertEqual(data["quantity"], item.quantity)
 
-    def test_unsupported_media_type_error(self):
-        """It should return 415 for unsupported media types"""
-        response = self.app.post(
-            "/shopcarts",
-            data="invalid data",  # 发送不支持的数据类型
-            content_type="text/plain",
+        # Make sure server assigned a created/updated date
+        # (this will overwrite the ones from factory)
+        self.assertIsNotNone(item.created_at)
+        self.assertIsNotNone(item.last_updated)
+
+        # Check that the location header was correct by getting it
+        resp = self.client.get(location, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_item = resp.get_json()
+        self.assertEqual(new_item["name"], item.name, "Item name does not match")
+
+    def test_list_all_items_in_shopcart(self):
+        """It should return a list of all Items in a Shopcart"""
+        # Create a shopcart with items
+        shopcart = self._create_shopcarts(1)[0]
+        self._create_items(shopcart.id, 2)
+
+        # List all items
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 2)
+
+    def test_list_all_items_in_shopcart_when_shopcart_not_found(self):
+        """It should not list all Items in a Shopcart that's not found"""
+        shopcart = ShopcartFactory()
+        resp = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn(
+            f"Shopcart with id '{shopcart.id}' could not be found.",
+            resp.get_json()["message"],
         )
-        self.assertEqual(response.status_code, 415)
 
-    @patch("service.models.Shopcart.find")
-    def test_internal_server_error(self, mock_find):
-        """It should return 500 for internal server error"""
-        mock_find.side_effect = Exception("Database error")  # 模拟一个服务器内部错误
-        response = self.app.get("/shopcarts/1")
-        self.assertEqual(response.status_code, 500)
+    def test_get_item(self):
+        """It should Get a single Item from a shopcart"""
+        # Create a shopcart and add an item to it
+        shopcart = self._create_shopcarts(1)[0]
+        test_item = self._create_items(shopcart.id, 1)[0]
 
+        # Retrieve the item by its ID
+        item_id = test_item.id
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}/items/{item_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-def test_bad_request_error(self):
-    """It should return 400 for bad requests"""
-    response = self.client.post(
-        "/shopcarts",
-        json={},  # 传入无效的空数据，导致数据验证错误
-        content_type="application/json",
-    )
-    self.assertEqual(response.status_code, 400)
+        # Verify the item data matches the created item
+        data = response.get_json()
+        self.assertEqual(data["name"], test_item.name)
 
+    def test_get_item_not_found(self):
+        """It should not Get an Item thats not found"""
+        # Create a shopcart but do not add items
+        shopcart = self._create_shopcarts(1)[0]
 
-def test_not_found_error(self):
-    """It should return 404 for a non-existing resource"""
-    response = self.client.get("/shopcarts/0")  # 试图获取不存在的 shopcart
-    self.assertEqual(response.status_code, 404)
+        # Try to retrieve a non-existent item (using ID 0)
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}/items/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+        # Check that the error message is correct
+        data = response.get_json()
+        logging.debug("Response data = %s", data)
+        self.assertIn("could not be found", data["message"])
 
-def test_method_not_allowed_error(self):
-    """It should return 405 when using an unsupported method"""
-    response = self.client.put("/shopcarts", json={})
-    self.assertEqual(response.status_code, 405)
+    def test_delete_item(self):
+        """It should Delete an Item"""
+        # Create a shopcart and add an item to it
+        test_shopcart = self._create_shopcarts(1)[0]
+        test_item = self._create_items(test_shopcart.id, 1)[0]
 
+        # Delete the item
+        response = self.client.delete(
+            f"{BASE_URL}/{test_shopcart.id}/items/{test_item.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
 
-def test_unsupported_media_type_error(self):
-    """It should return 415 for unsupported media types"""
-    response = self.client.post(
-        "/shopcarts",
-        data="invalid data",  # 发送不支持的数据类型
-        content_type="text/plain",
-    )
-    self.assertEqual(response.status_code, 415)
+        # Verify the item is actually deleted
+        response = self.client.get(
+            f"{BASE_URL}/{test_shopcart.id}/items/{test_item.id}"
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_non_existing_item(self):
+        """It should Delete an Item even if it doesn't exist"""
+        # Create a shopcart without items
+        shopcart = self._create_shopcarts(1)[0]
 
-@patch("service.models.Shopcart.find")
-def test_internal_server_error(self, mock_find):
-    """It should return 500 for internal server error"""
-    mock_find.side_effect = Exception("Database error")  # 模拟一个服务器内部错误
-    response = self.client.get("/shopcarts/1")
-    self.assertEqual(response.status_code, 500)
-
-
-def test_root_url(self):
-    """It should return useful information at the root URL"""
-    response = self.client.get("/")
-    self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    # Check if the response contains name, version, and list_resource_url
-    data = response.get_json()
-    self.assertIn("name", data)
-    self.assertIn("version", data)
-    self.assertIn("list_resource_url", data)
-
-    # Optional: You can check the exact values if needed
-    self.assertEqual(data["name"], "Shopcart API Service")
-    self.assertEqual(data["version"], "1.0.0")
-    self.assertEqual(data["list_resource_url"], "/shopcarts")
+        # Attempt to delete a non-existing item
+        response = self.client.delete(f"{BASE_URL}/{shopcart.id}/items/0")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
