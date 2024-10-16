@@ -37,8 +37,8 @@ def index():
     
     app.logger.info("Request for Root URL")
     response_data = {
-        "name": "Shopcart Microservice",  # 填写你的微服务名称
-        "version": "1.0.0",  # 填写你的微服务版本号
+        "name": "Shopcart Microservice",
+        "version": "1.0.0",
         "paths": url_for("list_shopcarts", _external=True),
     }
     return jsonify(response_data), status.HTTP_200_OK
