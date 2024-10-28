@@ -140,6 +140,29 @@ class TestItem(TestCase):
         shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(shopcart.items), 0)
 
+    def test_find_by_name(self):
+        """It should Find an Item by product name within a shopcart"""
+        shopcarts = Shopcart.all()
+        self.assertEqual(shopcarts, [])
+
+        shopcart = ShopcartFactory()
+        _ = ItemFactory(shopcart=shopcart)
+        shopcart.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(shopcart.id)
+        shopcarts = Shopcart.all()
+        self.assertEqual(len(shopcarts), 1)
+
+        # Find by correct
+        items_found = Item.find_by_name_within_shopcart(
+            shopcart.id, shopcart.items[0].name
+        )
+        self.assertEqual(items_found.count(), 1)
+
+        # Fetch it back again
+        no_items_found = Item.find_by_name_within_shopcart(shopcart.id, "bad search")
+        self.assertEqual(no_items_found.count(), 0)
+
     def test_serialize_an_item(self):
         """It should serialize an Item"""
         item = ItemFactory()

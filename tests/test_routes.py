@@ -308,6 +308,22 @@ class TestShopcart(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 2)
 
+    def test_list_all_items_filtered(self):
+        """It should return a list of all Items in a Shopcart after filtering for a name"""
+        # Create a shopcart with items
+        shopcart = self._create_shopcarts(1)[0]
+        test_items = self._create_items(shopcart.id, 2)
+        filtered_name = test_items[0].name
+
+        # List all items
+        response = self.client.get(
+            f"{BASE_URL}/{shopcart.id}/items", query_string={"name": filtered_name}
+        )
+        filtered_amount = len([x for x in test_items if x.name == filtered_name])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), filtered_amount)
+
     def test_list_all_items_in_shopcart_when_shopcart_not_found(self):
         """It should not list all Items in a Shopcart that's not found"""
         shopcart = ShopcartFactory()
