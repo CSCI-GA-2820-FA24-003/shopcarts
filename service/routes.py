@@ -84,8 +84,6 @@ def create_shopcarts():
 
     app.logger.info("Processing: %s", data)
     shopcart.deserialize(data)
-    shopcart.created_at = datetime.now()
-    shopcart.last_updated = datetime.now()
 
     # Save the new Shopcart to the database
     shopcart.create()
@@ -171,7 +169,6 @@ def update_shopcarts(shopcart_id):
         updated_json["items"] = shopcart.serialize()["items"]
     shopcart.deserialize(updated_json)
     shopcart.id = shopcart_id
-    shopcart.last_updated = datetime.now()
     shopcart.update()
 
     return jsonify(shopcart.serialize()), status.HTTP_200_OK
@@ -207,9 +204,6 @@ def create_items(shopcart_id):
     item = Item()
     item.deserialize(request.get_json())
     item.shopcart_id = shopcart_id
-    item.created_at = datetime.now()
-    item.last_updated = datetime.now()
-    shopcart.last_updated = datetime.now()
 
     # Append the item to the shopcart
     shopcart.items.append(item)
@@ -303,7 +297,6 @@ def update_items(shopcart_id, item_id):
     # Update from the json in the body of the request
     item.deserialize(request.get_json())
     item.id = item_id
-    item.last_updated = datetime.now()
     item.update()
 
     return jsonify(item.serialize()), status.HTTP_200_OK
