@@ -95,3 +95,16 @@ class Item(db.Model, PersistentBase):
             ) from error
 
         return self
+
+    @classmethod
+    def find_by_name_within_shopcart(cls, search_id, name):
+        """Returns all Items with the given product name within a shopcart with given id
+
+        Args:
+            search_id (int): the shopcart ID of the shopcart you're searching within
+            name (string): the name of the Item you want to match
+        """
+        logger.info(
+            "Processing name query for shopcart %d with name %s ...", search_id, name
+        )
+        return cls.query.filter(cls.shopcart_id == search_id, cls.name == name)
