@@ -21,7 +21,6 @@ This service implements a REST API that allows you to Create, Read, Update
 and Delete Shopcart
 """
 
-from datetime import datetime
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
 from service.models import Shopcart, Item
@@ -57,7 +56,12 @@ def list_shopcarts():
 
     shopcarts = []
 
-    shopcarts = Shopcart.all()
+    # Process the query string if any
+    name = request.args.get("customer-name")
+    if name:
+        shopcarts = Shopcart.find_by_customer_name(name)
+    else:
+        shopcarts = Shopcart.all()
 
     results = [shopcart.serialize() for shopcart in shopcarts]
     app.logger.info("Returning %d shopcarts", len(results))

@@ -97,7 +97,7 @@ class Shopcart(db.Model, PersistentBase):
         return self
 
     @classmethod
-    def find_by_name(cls, customer_name):
+    def find_by_customer_name(cls, customer_name):
         """Returns all Shopcarts with the given customer name
 
         Args:
