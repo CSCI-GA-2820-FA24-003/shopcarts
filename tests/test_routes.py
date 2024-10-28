@@ -208,6 +208,20 @@ class TestShopcart(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 5)
 
+    def test_get_shopcart_list_filtered(self):
+        """It should Get a list of Shopcarts with a customer name filter"""
+        test_shopcarts = self._create_shopcarts(5)
+        filtered_name = test_shopcarts[0].customer_name
+        response = self.client.get(
+            BASE_URL, query_string={"customer-name": filtered_name}
+        )
+        filtered_amount = len(
+            [x for x in test_shopcarts if x.customer_name == filtered_name]
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), filtered_amount)
+
     def test_get_shopcart(self):
         """It should get a single Shopcart"""
         test_shopcart = self._create_shopcarts(1)[0]

@@ -56,7 +56,12 @@ def list_shopcarts():
 
     shopcarts = []
 
-    shopcarts = Shopcart.all()
+    # Process the query string if any
+    name = request.args.get("customer-name")
+    if name:
+        shopcarts = Shopcart.find_by_customer_name(name)
+    else:
+        shopcarts = Shopcart.all()
 
     results = [shopcart.serialize() for shopcart in shopcarts]
     app.logger.info("Returning %d shopcarts", len(results))

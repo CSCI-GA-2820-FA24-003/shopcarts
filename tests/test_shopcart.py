@@ -175,7 +175,7 @@ class TestShopcart(TestCase):
         shopcart.create()
 
         # Fetch it back by customer name
-        same_shopcart = Shopcart.find_by_name(shopcart.customer_name)[0]
+        same_shopcart = Shopcart.find_by_customer_name(shopcart.customer_name)[0]
         self.assertEqual(same_shopcart.id, shopcart.id)
         self.assertEqual(same_shopcart.customer_name, shopcart.customer_name)
 
