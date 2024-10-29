@@ -96,6 +96,15 @@ class Shopcart(db.Model, PersistentBase):
 
         return self
 
+    def clear_shopcart(self):
+        """Remove all items from the shopcart"""
+        # Delete each item in the shopcart to avoid null violations
+        for item in self.items:
+            db.session.delete(item)
+        db.session.commit()  # Commit the deletion of items
+        self.items = []  # Clear the items relationship list
+        self.update()  # Save the changes to the shopcart itself
+
     @classmethod
     def find_by_customer_name(cls, customer_name):
         """Returns all Shopcarts with the given customer name
