@@ -201,6 +201,7 @@ class TestShopcart(TestCase):
         self.assertEqual(items[0]["description"], item.description)
         self.assertEqual(items[0]["price"], item.price)
         self.assertEqual(items[0]["quantity"], item.quantity)
+        self.assertEqual(items[0]["is_urgent"], item.is_urgent)
         self.assertEqual(items[0]["created_at"], item.created_at.isoformat())
         self.assertEqual(items[0]["last_updated"], item.last_updated.isoformat())
 

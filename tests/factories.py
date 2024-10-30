@@ -56,4 +56,5 @@ class ItemFactory(Factory):
     quantity = FuzzyInteger(1, 30)
     created_at = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
     last_updated = FuzzyDateTime(datetime(2024, 9, 5, 17, 0, 0, tzinfo=UTC))
+    is_urgent = Faker("pybool")
     shopcart = SubFactory(ShopcartFactory)

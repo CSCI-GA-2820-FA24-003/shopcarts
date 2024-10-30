@@ -43,6 +43,7 @@ class Item(db.Model, PersistentBase):
     description = db.Column(db.String(64))
     price = db.Column(db.Numeric(10, 2, asdecimal=False))
     quantity = db.Column(db.Integer)
+    is_urgent = db.Column(db.Boolean, default=False)
 
     # Database auditing fields
     created_at: datetime = db.Column(db.DateTime, default=db.func.now(), nullable=False)
@@ -67,6 +68,7 @@ class Item(db.Model, PersistentBase):
             "quantity": self.quantity,
             "created_at": self.created_at.isoformat(),
             "last_updated": self.last_updated.isoformat(),
+            "is_urgent": self.is_urgent,
         }
 
     def deserialize(self, data: dict) -> None:
@@ -82,6 +84,7 @@ class Item(db.Model, PersistentBase):
             self.description = data["description"]
             self.price = data["price"]
             self.quantity = data["quantity"]
+            self.is_urgent = data.get("is_urgent", False)
 
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
