@@ -363,6 +363,70 @@ def empty_shopcart(shopcart_id):
     return jsonify(shopcart.serialize()), status.HTTP_200_OK
 
 
+######################################################################
+# MARK AN ITEM AS URGENT
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>/urgent", methods=["PUT"])
+def mark_item_urgent(shopcart_id, item_id):
+    """
+    Mark an item as urgent in a shopcart
+    """
+    app.logger.info(
+        "Request to mark item [%s] as urgent in Shopcart with id: %s",
+        item_id,
+        shopcart_id,
+    )
+
+    # Find the item and return 404 if not found
+    item = Item.find(item_id)
+    if not item or item.shopcart_id != shopcart_id:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' in shopcart '{shopcart_id}' could not be found.",
+        )
+
+    # Mark the item as urgent
+    item.is_urgent = True
+    item.update()
+    app.logger.info("Item [%s] marked as urgent in Shopcart [%s]", item_id, shopcart_id)
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
+
+
+######################################################################
+# UNMARK AN ITEM AS URGENT
+######################################################################
+@app.route(
+    "/shopcarts/<int:shopcart_id>/items/<int:item_id>/urgent", methods=["DELETE"]
+)
+def unmark_item_urgent(shopcart_id, item_id):
+    """
+    Unmark an item as urgent in a shopcart
+    """
+    app.logger.info(
+        "Request to unmark item [%s] as urgent in Shopcart with id: %s",
+        item_id,
+        shopcart_id,
+    )
+
+    # Find the item and return 404 if not found
+    item = Item.find(item_id)
+    if not item or item.shopcart_id != shopcart_id:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' in shopcart '{shopcart_id}' could not be found.",
+        )
+
+    # Unmark the item as urgent
+    item.is_urgent = False
+    item.update()
+    app.logger.info(
+        "Item [%s] unmarked as urgent in Shopcart [%s]", item_id, shopcart_id
+    )
+
+    return jsonify(item.serialize()), status.HTTP_200_OK
+
+
 # ---------------------------------------------------------------------
 #                U  T I L I T Y   F U N C T I O N S
 # ---------------------------------------------------------------------

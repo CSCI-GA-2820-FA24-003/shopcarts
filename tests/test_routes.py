@@ -484,3 +484,68 @@ class TestShopcart(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
         self.assertIn("Shopcart with id '0' could not be found.", data["message"])
+
+        # ----------------------------------------------------------
+
+    # TEST MARK ITEM AS URGENT
+    # ----------------------------------------------------------
+    def test_mark_item_as_urgent(self):
+        """It should mark an item as urgent"""
+        # Create a shopcart and add an item
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(shopcart.id, 1)[0]
+
+        # Mark the item as urgent
+        response = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the item is marked as urgent
+        data = response.get_json()
+        self.assertTrue(data["is_urgent"], "Item should be marked as urgent")
+
+    # ----------------------------------------------------------
+    # TEST UNMARK ITEM AS URGENT
+    # ----------------------------------------------------------
+    def test_unmark_item_as_urgent(self):
+        """It should unmark an item as urgent"""
+        # Create a shopcart and add an urgent item
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(shopcart.id, 1)[0]
+
+        # Mark the item as urgent first
+        self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent")
+
+        # Unmark the item as urgent
+        response = self.client.delete(
+            f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the item is unmarked as urgent
+        data = response.get_json()
+        self.assertFalse(data["is_urgent"], "Item should be unmarked as urgent")
+
+    # ----------------------------------------------------------
+    # TEST IDPOTENT MARK/UNMARK AS URGENT
+    # ----------------------------------------------------------
+    def test_idempotent_mark_unmark_as_urgent(self):
+        """It should be idempotent for marking and unmarking urgent"""
+        # Create a shopcart and add an item
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(shopcart.id, 1)[0]
+
+        # Mark the item as urgent twice
+        self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent")
+        response = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertTrue(data["is_urgent"], "Item should stay marked as urgent")
+
+        # Unmark the item as urgent twice
+        self.client.delete(f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent")
+        response = self.client.delete(
+            f"{BASE_URL}/{shopcart.id}/items/{item.id}/urgent"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertFalse(data["is_urgent"], "Item should stay unmarked as urgent")
