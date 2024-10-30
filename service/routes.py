@@ -336,6 +336,33 @@ def delete_items(shopcart_id, item_id):
     return "", status.HTTP_204_NO_CONTENT
 
 
+######################################################################
+# EMPTY A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/empty", methods=["PUT"])
+def empty_shopcart(shopcart_id):
+    """
+    Empty a Shopcart
+
+    This endpoint will remove all items from a Shopcart
+    """
+    app.logger.info("Request to empty shopcart with id: %s", shopcart_id)
+
+    # Find the shopcart and return 404 if not found
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+
+    # Clear all items in the shopcart
+    shopcart.clear_shopcart()  # This method is implemented in the Shopcart model
+    app.logger.info("Shopcart with id [%s] emptied", shopcart_id)
+
+    return jsonify(shopcart.serialize()), status.HTTP_200_OK
+
+
 # ---------------------------------------------------------------------
 #                U  T I L I T Y   F U N C T I O N S
 # ---------------------------------------------------------------------

@@ -34,6 +34,8 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #        S H O P C A R T   M O D E L   T E S T   C A S E S
 ######################################################################
+# turn off too-any-public-methods since this is a class for test cases
+# pylint: disable=too-many-public-methods
 class TestShopcart(TestCase):
     """Shopcart Model Test Cases"""
 
@@ -231,3 +233,23 @@ class TestShopcart(TestCase):
         """It should not Deserialize an item with a TypeError"""
         item = Item()
         self.assertRaises(DataValidationError, item.deserialize, [])
+
+    def test_clear_shopcart(self):
+        """It should clear all items from a shopcart"""
+        # Create a shopcart with items
+        shopcart = ShopcartFactory()
+        item1 = ItemFactory()
+        item2 = ItemFactory()
+        shopcart.items.extend([item1, item2])
+        shopcart.create()
+
+        # Verify the shopcart has items
+        self.assertEqual(len(shopcart.items), 2)
+
+        # Clear the shopcart
+        shopcart.clear_shopcart()
+
+        # Verify the shopcart is now empty
+        self.assertEqual(
+            len(shopcart.items), 0, "Shopcart should be empty after clearing"
+        )

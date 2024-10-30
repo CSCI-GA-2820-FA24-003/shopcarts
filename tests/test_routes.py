@@ -433,3 +433,54 @@ class TestShopcart(TestCase):
         response = self.client.delete(f"{BASE_URL}/{shopcart.id}/items/0")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
+
+    # ----------------------------------------------------------
+    # TEST EMPTY SHOPCART
+    # ----------------------------------------------------------
+    def test_empty_shopcart(self):
+        """It should empty a shopcart"""
+        # Create a shopcart with items
+        shopcart = self._create_shopcarts(1)[0]
+        self._create_items(shopcart.id, 3)  # Add 3 items to the shopcart
+
+        # Verify the shopcart has items
+        response = self.client.get(f"{BASE_URL}/{shopcart.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertGreater(
+            len(data["items"]), 0, "Shopcart should initially have items"
+        )
+
+        # Call the empty endpoint
+        response = self.client.put(f"{BASE_URL}/{shopcart.id}/empty")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify the shopcart is now empty
+        data = response.get_json()
+        self.assertEqual(
+            len(data["items"]), 0, "Shopcart should be empty after emptying"
+        )
+
+    def test_empty_shopcart_idempotent(self):
+        """It should be idempotent when emptying a shopcart"""
+        # Create a shopcart with items and empty it
+        shopcart = self._create_shopcarts(1)[0]
+        self._create_items(shopcart.id, 3)
+        self.client.put(f"{BASE_URL}/{shopcart.id}/empty")
+
+        # Verify the shopcart is empty
+        response = self.client.put(f"{BASE_URL}/{shopcart.id}/empty")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Verify that calling empty again does not change the result
+        data = response.get_json()
+        self.assertEqual(
+            len(data["items"]), 0, "Shopcart should remain empty on repeated calls"
+        )
+
+    def test_empty_shopcart_not_found(self):
+        """It should not empty a Shopcart that's not found"""
+        response = self.client.put(f"{BASE_URL}/0/empty")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("Shopcart with id '0' could not be found.", data["message"])
