@@ -477,3 +477,10 @@ class TestShopcart(TestCase):
         self.assertEqual(
             len(data["items"]), 0, "Shopcart should remain empty on repeated calls"
         )
+
+    def test_empty_shopcart_not_found(self):
+        """It should not empty a Shopcart that's not found"""
+        response = self.client.put(f"{BASE_URL}/0/empty")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        data = response.get_json()
+        self.assertIn("Shopcart with id '0' could not be found.", data["message"])
