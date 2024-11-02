@@ -51,7 +51,10 @@ run: ## Run the service
 .PHONY: cluster
 cluster: ## Create a K3D Kubernetes cluster with load balancer and registry
 	$(info Creating Kubernetes cluster $(CLUSTER) with a registry and 2 worker nodes...)
+	docker build -t shopcarts:1.0 .
+	docker docker tag shopcarts:1.0 cluster-registry:5000/shopcarts:1.0
 	k3d cluster create $(CLUSTER) --agents 2 --registry-create cluster-registry:0.0.0.0:5000 --port '8080:80@loadbalancer'
+	docker push cluster-registry:5000/shopcarts:1.0
 
 .PHONY: cluster-rm
 cluster-rm: ## Remove a K3D Kubernetes cluster
