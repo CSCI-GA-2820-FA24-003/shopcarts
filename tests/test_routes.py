@@ -126,6 +126,13 @@ class TestShopcart(TestCase):
         data = resp.get_json()
         self.assertEqual(data["name"], "Shopcart Microservice")
 
+    def test_health_check(self):
+        """It should call the health check endpoint"""
+        resp = self.client.get("/health")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["message"], "Healthy")
+
     # ----------------------------------------------------------
     # TEST CREATE
     # ----------------------------------------------------------
