@@ -30,21 +30,22 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-ID_PREFIX = "pet_"
+ID_PREFIX = "shopcarts_"
 
 
-@when('I visit the "Home Page"')
+@when('I visit the "Management Page"')
 def step_impl(context):
-    """Make a call to the base URL"""
-    context.driver.get(context.base_url)
+    """Make a call to the management site"""
+    context.driver.get(f"{context.base_url}/manage")
     # Uncomment next line to take a screenshot of the web page
     # context.driver.save_screenshot('home_page.png')
 
 
-@then('I should see "{message}" in the title')
+@then('I should see "{message}" in the header')
 def step_impl(context, message):
     """Check the document title for a message"""
-    assert message in context.driver.title
+    element = context.driver.find_element(By.CLASS_NAME, "page-header")
+    assert message in element.text
 
 
 @then('I should not see "{text_string}"')
@@ -123,16 +124,14 @@ def step_impl(context, button):
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
     found = WebDriverWait(context.driver, context.wait_seconds).until(
-        expected_conditions.text_to_be_present_in_element(
-            (By.ID, "search_results"), name
-        )
+        expected_conditions.text_to_be_present_in_element((By.ID, "results"), name)
     )
     assert found
 
 
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
-    element = context.driver.find_element(By.ID, "search_results")
+    element = context.driver.find_element(By.ID, "results")
     assert name not in element.text
 
 
