@@ -133,6 +133,12 @@ class TestShopcart(TestCase):
         data = resp.get_json()
         self.assertEqual(data["message"], "Healthy")
 
+    def test_manage_page(self):
+        """It should call to check the ecommerce manager page"""
+        resp = self.client.get("/manage")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.content_type, "text/html; charset=utf-8")
+
     # ----------------------------------------------------------
     # TEST CREATE
     # ----------------------------------------------------------
