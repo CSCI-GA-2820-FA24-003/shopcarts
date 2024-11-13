@@ -41,23 +41,7 @@ def health_check():
 ######################################################################
 @app.route("/", methods=["GET"])
 def index():
-    """Root URL response with microservice details"""
-
-    app.logger.info("Request for Root URL")
-    response_data = {
-        "name": "Shopcart Microservice",
-        "version": "1.0.0",
-        "paths": url_for("list_shopcarts", _external=True),
-    }
-    return jsonify(response_data), status.HTTP_200_OK
-
-
-######################################################################
-# GET ECOMMERCE MANAGEMENT PAGE
-######################################################################
-@app.route("/manage", methods=["GET"])
-def manager_page():
-    """Send ecommerce manager page file"""
+    """Send ecommerce manager page file at index endpoint"""
     return app.send_static_file("index.html")
 
 
