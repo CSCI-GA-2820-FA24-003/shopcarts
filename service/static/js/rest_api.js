@@ -83,6 +83,39 @@ $(function () {
 
     });
 
+    // ****************************************
+    // Update a Shopcart
+    // ****************************************
+
+    $("#update-btn").click(function () {
+
+        let id = $("#shopcarts_id").val();
+        let customer_name = $("#shopcarts_customer_name").val();
+
+        let data = {
+            "customer_name": customer_name,
+        };
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/shopcarts/${id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            })
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
 
     // ****************************************
     // List Pets

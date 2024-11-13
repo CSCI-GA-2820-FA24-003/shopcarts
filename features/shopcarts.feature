@@ -40,3 +40,18 @@ Feature: The shopcarts service back-end
         And I press the "Retrieve" button
         Then I should see the message "Success"
         And I should see "Eve" in the "Customer Name" field
+
+    Scenario: Update a Pet
+        When I visit the "Management Page"
+        And I set the "Customer Name" to "Eve"
+        And I press the "Create" button
+        Then I should see the message "Success"
+        When I change "Customer Name" to "Fred"
+        And I press the "Update" button
+        Then I should see the message "Success"
+        And I should see "Fred" in the "Customer Name" field
+        When I press the "Clear" button
+        And I press the "List" button
+        Then I should see the message "Success"
+        And I should see "Fred" in the results
+        And I should not see "Eve" in the results
