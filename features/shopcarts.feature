@@ -9,10 +9,10 @@ Feature: The shopcarts service back-end
             | Alice         |
             | Bob           |
         And the following items
-            | customer_name | name  | description   | price | quantity | is_urgent |
-            | Alice         | hat   | hat clothing  | 2.45  | 12       | False     |
-            | Alice         | pant  | pant clothing | 8.75  | 2        | True      |
-            | Bob           | shirt | hat clothing  | 20.23 | 23       | False     |
+            | customer_name | name  | description    | price | quantity | is_urgent |
+            | Alice         | hat   | hat clothing   | 2.45  | 12       | False     |
+            | Alice         | pant  | pant clothing  | 8.75  | 2        | True      |
+            | Bob           | shirt | shirt clothing | 20.23 | 23       | False     |
 
     Scenario: The server is running
         When I visit the "Management Page"
@@ -40,3 +40,17 @@ Feature: The shopcarts service back-end
         And I press the "Retrieve" button
         Then I should see the message "Success"
         And I should see "Eve" in the "Customer Name" field
+
+    Scenario: Empty a shopcart
+        When I visit the "Management Page"
+        And I press the "List" button
+        Then I should see the message "Success"
+        When I copy the id of "Alice" from results
+        And I paste the "Id" field
+        And I press the "Empty" button
+        Then I should see the message "Success"
+        When I press the "List" button
+        Then I should see "shirt" in the results
+        And I should not see "hat" in the results
+        And I should not see "pant" in the results
+        And I should not see "bicycle" in the results

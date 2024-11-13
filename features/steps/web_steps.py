@@ -83,6 +83,21 @@ def step_impl(context, element_name):
     assert element.get_attribute("value") == ""
 
 
+@when('I copy the id of "{customer_name}" from results')
+def step_impl(context, customer_name):
+    table_id = WebDriverWait(context.driver, context.wait_seconds).until(
+        expected_conditions.presence_of_element_located((By.CLASS_NAME, "table-striped"))
+    )
+    rows = table_id.find_elements(By.XPATH, "./tbody/tr")
+    for row in rows:
+        name = row.find_elements(By.TAG_NAME, "td")[1]
+        if name.text == customer_name:
+            context.clipboard = row.find_elements(By.TAG_NAME, "td")[0].text
+            logging.info("Clipboard contains: %s", context.clipboard)
+            break
+    assert context.clipboard.isdigit()
+
+
 ##################################################################
 # These two function simulate copy and paste
 ##################################################################
