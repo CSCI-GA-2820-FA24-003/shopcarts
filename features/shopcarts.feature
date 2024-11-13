@@ -26,3 +26,18 @@ Feature: The shopcarts service back-end
         And I should see "hat" in the results
         And I should see "pant" in the results
         And I should not see "bicycle" in the results
+
+    Scenario: Create a shopcart
+        When I visit the "Management Page"
+        And I set the "Customer Name" to "Eve"
+        And I press the "Create" button
+        Then I should see the message "Success"
+        When I copy the "Id" field
+        And I press the "Clear" button
+        Then the "Id" field should be empty
+        And the "Customer Name" field should be empty
+        # TODO: Uncomment below when we implement GET
+        # When I paste the "Id" field
+        # And I press the "Retrieve" button
+        # Then I should see the message "Success"
+        # And I should see "Eve" in the "Customer Name" field

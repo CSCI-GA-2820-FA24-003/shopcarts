@@ -23,14 +23,35 @@
 
       <!-- FORM -->
       <div class="col-md-12" id="form_data">
-        <h3>List Shopcarts:</h3> <!-- Change this header after we add more functionality -->
+        <h3>Create, List Shopcarts:</h3> <!-- Change this header after we add more functionality -->
         <div class="well">
+
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="shopcarts_id">Shopcart ID:</label>
+              <div class="col-sm-6">
+                <input type="text" class="form-control" id="shopcarts_id" placeholder="Enter ID of Shopcart">
+              </div>
+            </div>
+          </div> <!-- form horizontal -->
+
+          <div class="form-horizontal">
+
+            <!-- Customer NAME -->
+            <div class="form-group">
+              <label class="control-label col-sm-2" for="shopcarts_customer_name">Customer Name:</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="shopcarts_customer_name" placeholder="Enter customer name for shopcart">
+              </div>
+            </div>
 
           <div class="form-horizontal">
 
             <!-- SUBMIT BUTTONS -->
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+                <button type="submit" class="btn btn-success" id="create-btn">Create</button>
                 <button type="submit" class="btn btn-primary" id="list-btn">List</button>
               </div>
             </div>
