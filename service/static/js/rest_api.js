@@ -1,14 +1,59 @@
 $(function () {
 
-        // ****************************************
+    // ****************************************
     //  U T I L I T Y   F U N C T I O N S
     // ****************************************
+
+    // Updates the form with data from the response
+    function update_form_data(res) {
+        $("#shopcarts_id").val(res.id);
+        $("#shopcarts_customer_name").val(res.customer_name);
+    }
 
     // Updates the flash message area
     function flash_message(message) {
         $("#flash_message").empty();
         $("#flash_message").append(message);
     }
+
+    /// Clears all form fields
+    function clear_form_data() {
+        $("#shopcarts_customer_name").val("");
+    }
+    
+
+    // ****************************************
+    // Create a Shopcart
+    // ****************************************
+
+    $("#create-btn").click(function () {
+
+        let customer_name = $("#shopcarts_customer_name").val();
+
+        let data = {
+            "customer_name": customer_name,
+        };
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "POST",
+            url: "/shopcarts",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+
 
     // ****************************************
     // List Pets
@@ -62,4 +107,15 @@ $(function () {
             flash_message(res.responseJSON.message)
         });
     });
+
+    // ****************************************
+    // Clear the form
+    // ****************************************
+
+    $("#clear-btn").click(function () {
+        $("#shopcarts_id").val("");
+        $("#flash_message").empty();
+        clear_form_data()
+    });
+
 })
