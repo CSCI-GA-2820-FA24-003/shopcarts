@@ -78,10 +78,16 @@ class Shopcart(db.Model, PersistentBase):
 
             # handle inner list of items
             item_list = data.get("items")
-            for json_item in item_list:
-                item = Item()
-                item.deserialize(json_item)
-                self.items.append(item)
+            if item_list is not None:
+                if self.items:
+                    self.clear_shopcart()
+                for json_item in item_list:
+                    item = Item()
+                    item.deserialize(json_item)
+                    item.shopcart_id = self.id
+
+                    self.items.append(item)
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
