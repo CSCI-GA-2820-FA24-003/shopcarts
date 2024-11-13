@@ -36,7 +36,7 @@ ID_PREFIX = "shopcarts_"
 @when('I visit the "Management Page"')
 def step_impl(context):
     """Make a call to the management site"""
-    context.driver.get(f"{context.base_url}/manage")
+    context.driver.get(f"{context.base_url}")
     # Uncomment next line to take a screenshot of the web page
     # context.driver.save_screenshot('home_page.png')
 

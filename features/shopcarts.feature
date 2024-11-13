@@ -39,4 +39,4 @@ Feature: The shopcarts service back-end
         When I paste the "Id" field
         And I press the "Retrieve" button
         Then I should see the message "Success"
-        And I should see "Bob" in the "Customer Name" field
+        And I should see "Eve" in the "Customer Name" field
