@@ -147,7 +147,7 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Shopcart
     // ****************************************
 
     $("#delete-btn").click(function () {
@@ -165,7 +165,7 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Shopcart has been Deleted!")
+            flash_message("Success")
         });
 
         ajax.fail(function(res){
@@ -174,7 +174,7 @@ $(function () {
     });
 
     // ****************************************
-    // List Pets
+    // List Shopcarts
     // ****************************************
 
     $("#list-btn").click(function () {
