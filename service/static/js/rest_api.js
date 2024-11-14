@@ -146,6 +146,32 @@ $(function () {
 
     });
 
+    // ****************************************
+    // Delete a Pet
+    // ****************************************
+
+    $("#delete-btn").click(function () {
+
+        let id = $("#shopcarts_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/shopcarts/${id}`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Shopcart has been Deleted!")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
 
     // ****************************************
     // List Pets
