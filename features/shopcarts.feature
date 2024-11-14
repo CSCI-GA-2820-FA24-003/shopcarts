@@ -69,3 +69,17 @@ Feature: The shopcarts service back-end
         Then I should see the message "Success"
         And I should see "Fred" in the results
         And I should not see "Eve" in the results
+
+    Scenario: Delete a shopcart
+        When I visit the "Management Page"
+        And I set the "Customer Name" to "Deleted"
+        And I press the "Create" button
+        Then I should see the message "Success"
+        When I press the "Delete" button
+        Then I should see the message "Success"
+        When I press the "List" button
+        Then I should see the message "Success"
+        And I should see "Alice" in the results
+        And I should see "Bob" in the results
+        And I should not see "Deleted" in the results
+        

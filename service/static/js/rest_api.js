@@ -146,9 +146,35 @@ $(function () {
 
     });
 
+    // ****************************************
+    // Delete a Shopcart
+    // ****************************************
+
+    $("#delete-btn").click(function () {
+
+        let id = $("#shopcarts_id").val();
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/shopcarts/${id}`,
+            contentType: "application/json",
+            data: '',
+        })
+
+        ajax.done(function(res){
+            clear_form_data()
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message("Server error!")
+        });
+    });
 
     // ****************************************
-    // List Pets
+    // List Shopcarts
     // ****************************************
 
     $("#list-btn").click(function () {
