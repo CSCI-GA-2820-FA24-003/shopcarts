@@ -82,4 +82,16 @@ Feature: The shopcarts service back-end
         And I should see "Alice" in the results
         And I should see "Bob" in the results
         And I should not see "Deleted" in the results
-        
+
+    Scenario: Search shopcarts
+        When I visit the "Management Page"
+        And I set the "Customer Name" to "Nothing"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should not see "Alice" in the results
+        And I should not see "Bob" in the results
+        When I set the "Customer Name" to "Alice"
+        And I press the "Search" button
+        Then I should see the message "Success"
+        And I should see "Alice" in the results
+        And I should not see "Bob" in the results
