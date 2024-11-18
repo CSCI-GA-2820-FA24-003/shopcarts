@@ -41,7 +41,7 @@ def health_check():
 ######################################################################
 # GET INDEX
 ######################################################################
-# TODO: Update this route when prefix is added to the api
+# TODO: Update this route when prefix is added to the api # pylint: disable=W0511
 # @app.route("/", methods=["GET"])
 @app.route("/index", methods=["GET"])
 def index():
@@ -179,7 +179,7 @@ class ShopcartCollection(Resource):
         shopcart.deserialize(api.payload)
         shopcart.create()
         app.logger.info("Shopcart with new id [%s] created!", shopcart.id)
-        # TODO: Update the line below when ShopcartCollection is defined
+        # TODO: Update the line below when ShopcartCollection is defined # pylint: disable=W0511
         location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
         # location_url = api.url_for(ShopcartCollection, shopcart_id=shopcart.id, _external=True)
         return shopcart.serialize(), status.HTTP_201_CREATED, {"Location": location_url}

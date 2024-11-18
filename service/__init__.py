@@ -55,14 +55,17 @@ def create_app():
         default="shopcarts",
         default_label="Shopcarts operations",
         doc="/apidocs",
-        # TODO: Add prefix to the api when all the routes are defined, and update BASE_URL in test_routes.py to /api/shopcarts
+        # TODO: Add prefix to the api when all the routes are defined, and update BASE_URL in test_routes.py to /api/shopcarts # pylint: disable=W0511
         # prefix="/api",
     )
 
     with app.app_context():
         # Dependencies require we import the routes AFTER the Flask app is created
         # pylint: disable=wrong-import-position, wrong-import-order, unused-import
-        from service import routes, models  # noqa: F401 E402
+        from service import (
+            routes,
+            models,
+        )  # noqa: F401 E402 # pylint: disable=cyclic-import
         from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
         try:

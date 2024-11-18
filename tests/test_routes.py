@@ -121,7 +121,7 @@ class TestShopcart(TestCase):
 
     def test_index(self):
         """It should call the home page"""
-        # TODO: Update this route when prefix is added to the api
+        # TODO: Update this route when prefix is added to the api # pylint: disable=W0511
         # resp = self.client.get("/")
         resp = self.client.get("/index")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
