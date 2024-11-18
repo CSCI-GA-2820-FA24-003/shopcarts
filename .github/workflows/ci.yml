@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv .venv
-          source .venv/bin/activate
+          . .venv/bin/activate
           python -m pip install --no-cache-dir -U pip poetry
           poetry lock --no-update
           poetry install
