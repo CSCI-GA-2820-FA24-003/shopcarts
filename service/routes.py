@@ -24,7 +24,7 @@ and Delete Shopcart
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
 from flask_restx import Resource, fields, reqparse, inputs
-from service.models import Shopcart, Item
+from service.models import Shopcart, Item  # pylint: disable=cyclic-import
 from service.common import status  # HTTP Status Codes
 from . import api
 
