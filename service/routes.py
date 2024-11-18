@@ -118,13 +118,23 @@ shopcart_model = api.inherit(
 # query string arguments
 shopcart_args = reqparse.RequestParser()
 shopcart_args.add_argument(
-    "customer-name", type=str, required=False, help="The name of the customer"
+    "customer-name",
+    type=str,
+    location="args",
+    required=False,
+    help="The name of the customer",
 )
 
 item_args = reqparse.RequestParser()
-item_args.add_argument("name", type=str, required=False, help="The name of the item")
 item_args.add_argument(
-    "is_urgent", type=bool, required=False, help="Indicates whether the item is urgent"
+    "name", type=str, location="args", required=False, help="The name of the item"
+)
+item_args.add_argument(
+    "is_urgent",
+    type=inputs.boolean,
+    location="args",
+    required=False,
+    help="Indicates whether the item is urgent",
 )
 
 
