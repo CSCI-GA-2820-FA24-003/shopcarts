@@ -67,6 +67,11 @@ jobs:
       - name: Update poetry.lock
         run: poetry lock --no-update
 
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          poetry install
+
       - name: Upload code coverage
         uses: codecov/codecov-action@v3.1.4
         with:
