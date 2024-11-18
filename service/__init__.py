@@ -55,7 +55,8 @@ def create_app():
         default="shopcarts",
         default_label="Shopcarts operations",
         doc="/apidocs",
-        prefix="/api",
+        # TODO: Add prefix to the api when all the routes are defined, and update BASE_URL in test_routes.py to /api/shopcarts
+        # prefix="/api",
     )
 
     with app.app_context():

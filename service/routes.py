@@ -23,8 +23,10 @@ and Delete Shopcart
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
+from flask_restx import Resource, fields, reqparse, inputs
 from service.models import Shopcart, Item
 from service.common import status  # HTTP Status Codes
+from . import api
 
 
 ######################################################################
@@ -39,70 +41,143 @@ def health_check():
 ######################################################################
 # GET INDEX
 ######################################################################
-@app.route("/", methods=["GET"])
+# TODO: Update this route when prefix is added to the api
+# @app.route("/", methods=["GET"])
+@app.route("/index", methods=["GET"])
 def index():
     """Send ecommerce manager page file at index endpoint"""
     return app.send_static_file("index.html")
 
 
+# Define the Item model
+create_item_model = api.model(
+    "Item",
+    {
+        "id": fields.Integer(description="The ID of the item"),
+        "shopcart_id": fields.Integer(
+            description="The ID of the shopcart this item belongs to"
+        ),
+        "name": fields.String(required=True, description="The name of the item"),
+        "description": fields.String(description="A description of the item"),
+        "price": fields.Float(required=True, description="The price of the item"),
+        "quantity": fields.Integer(
+            required=True, description="The quantity of the item"
+        ),
+        "is_urgent": fields.Boolean(
+            default=False, description="Indicates whether the item is urgent"
+        ),
+        "created_at": fields.DateTime(
+            description="The date and time the item was created"
+        ),
+        "last_updated": fields.DateTime(
+            description="The date and time the item was last updated"
+        ),
+    },
+)
+
+item_model = api.inherit(
+    "ItemModel",
+    create_item_model,
+    {
+        "_id": fields.String(
+            readOnly=True, description="The unique id assigned internally by service"
+        )
+    },
+)
+
+# Define the Shopcart model
+create_shopcart_model = api.model(
+    "Shopcart",
+    {
+        "id": fields.Integer(required=True, description="The ID of the shopcart"),
+        "customer_name": fields.String(
+            required=True, description="The name of the customer"
+        ),
+        "items": fields.List(
+            fields.Nested(item_model), description="The list of items in the shopcart"
+        ),
+        "created_at": fields.DateTime(
+            description="The date and time the shopcart was created"
+        ),
+        "last_updated": fields.DateTime(
+            description="The date and time the shopcart was last updated"
+        ),
+    },
+)
+
+shopcart_model = api.inherit(
+    "ShopcartModel",
+    create_shopcart_model,
+    {
+        "_id": fields.String(
+            readOnly=True, description="The unique id assigned internally by service"
+        )
+    },
+)
+
+# query string arguments
+shopcart_args = reqparse.RequestParser()
+shopcart_args.add_argument(
+    "customer-name", type=str, required=False, help="The name of the customer"
+)
+
+item_args = reqparse.RequestParser()
+item_args.add_argument("name", type=str, required=False, help="The name of the item")
+item_args.add_argument(
+    "is_urgent", type=bool, required=False, help="Indicates whether the item is urgent"
+)
+
+
+######################################################################
+#  PATH: /shopcarts
+######################################################################
+@api.route("/shopcarts", strict_slashes=False)
+class ShopcartCollection(Resource):
+    """Handles all interactions with collections of Shopcarts"""
+
+    @api.doc("list_shopcarts")
+    @api.expect(shopcart_args, validate=True)
+    @api.marshal_list_with(shopcart_model)
+    def get(self):
+        """Returns all of the Shopcarts"""
+        app.logger.info("Request to list Shopcarts...")
+
+        shopcarts = []
+        # Process the query string if any
+        name = request.args.get("customer-name")
+        if name:
+            shopcarts = Shopcart.find_by_customer_name(name)
+        else:
+            shopcarts = Shopcart.all()
+
+        results = [shopcart.serialize() for shopcart in shopcarts]
+        app.logger.info("Returning %d shopcarts", len(results))
+        return results, status.HTTP_200_OK
+
+    @api.doc("create_shopcarts")
+    @api.response(400, "The posted data was not valid")
+    @api.expect(create_shopcart_model)
+    @api.marshal_with(shopcart_model, code=201)
+    def post(self):
+        """
+        Creates a Shopcart
+        This endpoint will create a Shopcart based the data in the body that is posted
+        """
+        app.logger.info("Request to Create a Shopcart")
+        shopcart = Shopcart()
+        app.logger.debug("Payload = %s", api.payload)
+        shopcart.deserialize(api.payload)
+        shopcart.create()
+        app.logger.info("Shopcart with new id [%s] created!", shopcart.id)
+        # TODO: Update the line below when ShopcartCollection is defined
+        location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
+        # location_url = api.url_for(ShopcartCollection, shopcart_id=shopcart.id, _external=True)
+        return shopcart.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
+
+
 ######################################################################
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
-######################################################################
-# LIST ALL SHOPCARTS
-######################################################################
-@app.route("/shopcarts", methods=["GET"])
-def list_shopcarts():
-    """Returns all of the Shopcarts"""
-    app.logger.info("Request for shopcart list")
-
-    shopcarts = []
-
-    # Process the query string if any
-    name = request.args.get("customer-name")
-    if name:
-        shopcarts = Shopcart.find_by_customer_name(name)
-    else:
-        shopcarts = Shopcart.all()
-
-    results = [shopcart.serialize() for shopcart in shopcarts]
-    app.logger.info("Returning %d shopcarts", len(results))
-    return jsonify(results), status.HTTP_200_OK
-
-
-######################################################################
-# CREATE A NEW SHOPCART
-######################################################################
-@app.route("/shopcarts", methods=["POST"])
-def create_shopcarts():
-    """
-    Create a Shopcart
-    This endpoint will create a Shopcart based the data in the body that is posted
-    """
-    app.logger.info("Request to Create a Shopcart...")
-    check_content_type("application/json")
-
-    shopcart = Shopcart()
-    # Get the data from the request and deserialize it
-    data = request.get_json()
-    # Make sure to fill in the audit dates and start with an empty item list
-    data["items"] = []
-
-    app.logger.info("Processing: %s", data)
-    shopcart.deserialize(data)
-
-    # Save the new Shopcart to the database
-    shopcart.create()
-    app.logger.info("Shopcart with new id [%s] saved!", shopcart.id)
-
-    # Return the location of the new Shopcart
-    location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
-
-    return (
-        jsonify(shopcart.serialize()),
-        status.HTTP_201_CREATED,
-        {"Location": location_url},
-    )
 
 
 ######################################################################
