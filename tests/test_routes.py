@@ -24,6 +24,7 @@ import logging
 import os
 from datetime import UTC, datetime
 from unittest import TestCase
+from urllib.parse import quote_plus
 
 from service.common import status
 from service.models import Shopcart, db
@@ -325,7 +326,8 @@ class TestShopcart(TestCase):
 
         # List all items
         response = self.client.get(
-            f"{BASE_URL}/{shopcart.id}/items", query_string={"name": filtered_name}
+            f"{BASE_URL}/{shopcart.id}/items",
+            query_string=f"name={quote_plus(filtered_name)}",
         )
         filtered_amount = len([x for x in test_items if x.name == filtered_name])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -337,7 +339,7 @@ class TestShopcart(TestCase):
         resp = self.client.get(f"{BASE_URL}/0/items")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn(
-            "Shopcart with id '0' could not be found.",
+            "Shopcart with id '0' was not found.",
             resp.get_json()["message"],
         )
 
@@ -368,7 +370,7 @@ class TestShopcart(TestCase):
         # Check that the error message is correct
         data = response.get_json()
         logging.debug("Response data = %s", data)
-        self.assertIn("could not be found", data["message"])
+        self.assertIn("was not found", data["message"])
 
     def test_update_item(self):
         """It should Update an item in a shopcart"""
