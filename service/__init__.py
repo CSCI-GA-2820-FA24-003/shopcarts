@@ -20,8 +20,12 @@ and SQL database
 """
 import sys
 from flask import Flask
+from flask_restx import Api
 from service import config
 from service.common import log_handlers
+
+# Will be initialize when app is created
+api = None  # pylint: disable=invalid-name
 
 
 ############################################################
@@ -39,10 +43,30 @@ def create_app():
 
     db.init_app(app)
 
+    ######################################################################
+    # Configure Swagger before initializing it
+    ######################################################################
+    global api
+    api = Api(
+        app,
+        version="1.0.0",
+        title="Shopcarts REST API Service",
+        description="This is a Shopcarts server.",
+        default="shopcarts",
+        default_label="Shopcarts operations",
+        doc="/apidocs",
+        # TODO: Add prefix to the api when all the routes are defined, # pylint: disable=W0511
+        # TODO: Update BASE_URL in test_routes.py to /api/shopcarts  # pylint: disable=W0511
+        # prefix="/api",
+    )
+
     with app.app_context():
         # Dependencies require we import the routes AFTER the Flask app is created
         # pylint: disable=wrong-import-position, wrong-import-order, unused-import
-        from service import routes, models  # noqa: F401 E402
+        from service import (
+            routes,
+            models,
+        )  # noqa: F401 E402 # pylint: disable=cyclic-import
         from service.common import error_handlers, cli_commands  # noqa: F401, E402
 
         try:
