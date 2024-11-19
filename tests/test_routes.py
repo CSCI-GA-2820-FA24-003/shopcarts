@@ -36,7 +36,7 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
 
-BASE_URL = "/shopcarts"
+BASE_URL = "/api/shopcarts"
 
 
 ######################################################################
@@ -122,9 +122,7 @@ class TestShopcart(TestCase):
 
     def test_index(self):
         """It should call the home page"""
-        # TODO: Update this route when prefix is added to the api # pylint: disable=W0511
-        # resp = self.client.get("/")
-        resp = self.client.get("/index")
+        resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.content_type, "text/html; charset=utf-8")
 

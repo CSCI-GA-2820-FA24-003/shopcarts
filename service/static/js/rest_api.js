@@ -71,7 +71,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/shopcarts",
+            url: "/api/shopcarts",
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -98,7 +98,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts/${shopcarts_id}`,
+            url: `/api/shopcarts/${shopcarts_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -128,7 +128,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/shopcarts/${shopcarts_id}/empty`,
+            url: `/api/shopcarts/${shopcarts_id}/empty`,
             contentType: "application/json",
             data: ''
         })
@@ -163,7 +163,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/shopcarts/${id}`,
+                url: `/api/shopcarts/${id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -191,7 +191,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/shopcarts/${id}`,
+            url: `/api/shopcarts/${id}`,
             contentType: "application/json",
             data: '',
         })
@@ -214,7 +214,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts`,
+            url: `/api/shopcarts`,
             contentType: "application/json",
             data: ''
         })
@@ -258,7 +258,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts?${queryString}`,
+            url: `/api/shopcarts?${queryString}`,
             contentType: "application/json",
             data: ''
         })

@@ -59,9 +59,7 @@ def health_check():
 ######################################################################
 # GET INDEX
 ######################################################################
-# TODO: Update this route when prefix is added to the api # pylint: disable=W0511
-# @app.route("/", methods=["GET"])
-@app.route("/index", methods=["GET"])
+@app.route("/", methods=["GET"])
 def index():
     """Send ecommerce manager page file at index endpoint"""
     return app.send_static_file("index.html")

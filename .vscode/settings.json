@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "ECOMMERCE",
+        "jsonify",
         "onupdate",
         "psycopg",
         "reqparse",
