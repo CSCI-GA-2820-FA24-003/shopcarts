@@ -53,12 +53,13 @@ def index():
 create_item_model = api.model(
     "Item",
     {
-        "id": fields.Integer(description="The ID of the item"),
         "shopcart_id": fields.Integer(
-            description="The ID of the shopcart this item belongs to"
+            required=True, description="The ID of the shopcart this item belongs to"
         ),
         "name": fields.String(required=True, description="The name of the item"),
-        "description": fields.String(description="A description of the item"),
+        "description": fields.String(
+            required=True, description="A description of the item"
+        ),
         "price": fields.Float(required=True, description="The price of the item"),
         "quantity": fields.Integer(
             required=True, description="The quantity of the item"
@@ -79,7 +80,7 @@ item_model = api.inherit(
     "ItemModel",
     create_item_model,
     {
-        "_id": fields.String(
+        "id": fields.Integer(
             readOnly=True, description="The unique id assigned internally by service"
         )
     },
@@ -89,7 +90,6 @@ item_model = api.inherit(
 create_shopcart_model = api.model(
     "Shopcart",
     {
-        "id": fields.Integer(required=True, description="The ID of the shopcart"),
         "customer_name": fields.String(
             required=True, description="The name of the customer"
         ),
@@ -109,7 +109,7 @@ shopcart_model = api.inherit(
     "ShopcartModel",
     create_shopcart_model,
     {
-        "_id": fields.String(
+        "id": fields.Integer(
             readOnly=True, description="The unique id assigned internally by service"
         )
     },
@@ -128,13 +128,6 @@ shopcart_args.add_argument(
 item_args = reqparse.RequestParser()
 item_args.add_argument(
     "name", type=str, location="args", required=False, help="The name of the item"
-)
-item_args.add_argument(
-    "is_urgent",
-    type=inputs.boolean,
-    location="args",
-    required=False,
-    help="Indicates whether the item is urgent",
 )
 
 
