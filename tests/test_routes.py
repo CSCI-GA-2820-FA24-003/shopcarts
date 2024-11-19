@@ -243,7 +243,7 @@ class TestShopcart(TestCase):
         response = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
-        self.assertIn("Shopcart with id '0' could not be found.", data["message"])
+        self.assertIn("Shopcart with id '0' was not found.", data["message"])
 
     # ----------------------------------------------------------
     # IMPROPER REQUEST TESTS
@@ -334,11 +334,10 @@ class TestShopcart(TestCase):
 
     def test_list_all_items_in_shopcart_when_shopcart_not_found(self):
         """It should not list all Items in a Shopcart that's not found"""
-        shopcart = ShopcartFactory()
-        resp = self.client.get(f"{BASE_URL}/{shopcart.id}/items")
+        resp = self.client.get(f"{BASE_URL}/0/items")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn(
-            f"Shopcart with id '{shopcart.id}' could not be found.",
+            "Shopcart with id '0' could not be found.",
             resp.get_json()["message"],
         )
 
@@ -491,7 +490,7 @@ class TestShopcart(TestCase):
         response = self.client.put(f"{BASE_URL}/0/empty")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         data = response.get_json()
-        self.assertIn("Shopcart with id '0' could not be found.", data["message"])
+        self.assertIn("Shopcart with id '0' was not found.", data["message"])
 
         # ----------------------------------------------------------
 
