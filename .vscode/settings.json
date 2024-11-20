@@ -1,12 +1,18 @@
 {
     "cSpell.words": [
         "ECOMMERCE",
+        "jsonify",
         "onupdate",
         "psycopg",
+        "reqparse",
+        "restx",
         "Shopcart",
         "Shopcarts",
         "sqlalchemy",
-        "testdb"
+        "testdb",
+        "UNMARK",
+        "unmarking",
+        "Unmarks"
     ],
     "python.analysis.typeCheckingMode": "off",
     "makefile.configureOnOpen": false
