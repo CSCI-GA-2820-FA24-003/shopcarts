@@ -26,7 +26,7 @@ GET / - Displays a UI for Selenium testing
 GET /shopcarts - Returns a list all of the Shopcarts
 POST /shopcarts - creates a new Shopcart record in the database
 GET /shopcarts/{id} - Returns the Shopcart with a given ID number
-PUT /shopcarts/{id} - updates a Shopcart record in the database
+PUT /shopcarts/{id} - Updates a Shopcart record in the database
 DELETE /shopcarts/{id} - deletes a Shopcart record in the database
 PUT /shopcarts/{id}/empty - empties a Shopcart of items
 GET /shopcarts/{id}/items - Returns a list all of the Items in a shopcart
