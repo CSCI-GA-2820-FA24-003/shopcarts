@@ -28,7 +28,7 @@ POST /shopcarts - creates a new Shopcart record in the database
 GET /shopcarts/{id} - Returns the Shopcart with a given ID number
 PUT /shopcarts/{id} - Updates a Shopcart record in the database
 DELETE /shopcarts/{id} - Deletes a Shopcart record in the database
-PUT /shopcarts/{id}/empty - empties a Shopcart of items
+PUT /shopcarts/{id}/empty - Empties a Shopcart of items
 GET /shopcarts/{id}/items - Returns a list all of the Items in a shopcart
 POST /shopcarts/{id}/items - creates a new Item record in the database
 GET /shopcarts/{id}/items/{item-id} - Returns the Shopcart with a given id number
