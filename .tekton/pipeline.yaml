@@ -3,9 +3,9 @@ kind: Pipeline
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"tekton.dev/v1","kind":"Pipeline","metadata":{"annotations":{},"creationTimestamp":"2024-11-27T21:52:08Z","generation":1,"managedFields":[{"apiVersion":"tekton.dev/v1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{".":{},"f:params":{},"f:tasks":{},"f:workspaces":{}}},"manager":"kubectl-client-side-apply","operation":"Update","time":"2024-11-27T21:52:08Z"}],"name":"cd-pipeline","namespace":"safipatel-dev","resourceVersion":"2769183424","uid":"816fee74-16f5-4cc0-9d02-bb92a6f68e4e"},"spec":{"finally":[],"params":[{"description":"The URL to the git repo","name":"GIT_REPO","type":"string"},{"default":"master","description":"The reference (branch or ref)","name":"GIT_REF","type":"string"},{"default":"shopcart","description":"Name of the application","name":"APP_NAME","type":"string"},{"default":"image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(params.APP_NAME):latest","description":"The name of the image to build","name":"IMAGE_NAME","type":"string"}],"tasks":[{"name":"git-clone","params":[{"name":"url","value":"$(params.GIT_REPO)"},{"name":"revision","value":"$(params.GIT_REF)"},{"name":"refspec","value":""},{"name":"submodules","value":"true"},{"name":"depth","value":"1"},{"name":"sslVerify","value":"true"},{"name":"crtFileName","value":"ca-bundle.crt"},{"name":"subdirectory","value":""},{"name":"sparseCheckoutDirectories","value":""},{"name":"deleteExisting","value":"true"},{"name":"httpProxy","value":""},{"name":"httpsProxy","value":""},{"name":"noProxy","value":""},{"name":"verbose","value":"true"},{"name":"gitInitImage","value":"registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:dd5c8d08d52e304a542921634ebe6b5ff3d63c5f68f6d644e88417859b173ec8"},{"name":"userHome","value":"/home/git"}],"taskRef":{"kind":"ClusterTask","name":"git-clone"},"workspaces":[{"name":"output","workspace":"pipeline-workspace"}]},{"name":"pylint","params":[{"name":"image","value":"docker.io/python:3.11-slim"},{"name":"path","value":"service"},{"name":"args","value":[]},{"name":"requirements-file","value":"requirements.txt"}],"runAfter":["git-clone"],"taskRef":{"kind":"Task","name":"pylint"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]},{"name":"testing","params":[{"name":"pytest-args","value":[]},{"name":"secret-name","value":"postgres-creds"},{"name":"secret-key","value":"database_uri"}],"runAfter":["git-clone"],"taskRef":{"kind":"Task","name":"pytest-env"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]},{"name":"buildah","params":[{"name":"IMAGE","value":"$(params.IMAGE_NAME)"},{"name":"BUILDER_IMAGE","value":"registry.redhat.io/rhel8/buildah@sha256:5c7cd7c9a3d49e8905fc98693f6da605aeafae36bde5622dc78e12f31db3cd59"},{"name":"STORAGE_DRIVER","value":"vfs"},{"name":"DOCKERFILE","value":"./Dockerfile"},{"name":"CONTEXT","value":"."},{"name":"TLSVERIFY","value":"true"},{"name":"FORMAT","value":"oci"},{"name":"BUILD_EXTRA_ARGS","value":""},{"name":"PUSH_EXTRA_ARGS","value":""},{"name":"SKIP_PUSH","value":"false"}],"runAfter":["pylint","testing"],"taskRef":{"kind":"ClusterTask","name":"buildah"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]},{"name":"deploy-image","params":[{"name":"image-name","value":"$(params.IMAGE_NAME)"},{"name":"manifest-dir","value":"k8s"}],"runAfter":["buildah"],"taskRef":{"kind":"Task","name":"deploy-image"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]}],"workspaces":[{"name":"pipeline-workspace"}]}}
-  creationTimestamp: '2024-11-27T21:52:08Z'
-  generation: 2
+      {"apiVersion":"tekton.dev/v1","kind":"Pipeline","metadata":{"annotations":{},"creationTimestamp":"2024-11-27T21:52:08Z","generation":2,"managedFields":[{"apiVersion":"tekton.dev/v1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{".":{},"f:finally":{},"f:params":{},"f:tasks":{},"f:workspaces":{}}},"manager":"kubectl-client-side-apply","operation":"Update","time":"2024-11-27T21:52:44Z"}],"name":"cd-pipeline","namespace":"safipatel-dev","resourceVersion":"2769184899","uid":"816fee74-16f5-4cc0-9d02-bb92a6f68e4e"},"spec":{"params":[{"description":"The URL to the git repo","name":"GIT_REPO","type":"string"},{"default":"master","description":"The reference (branch or ref)","name":"GIT_REF","type":"string"},{"default":"shopcart","description":"Name of the application","name":"APP_NAME","type":"string"},{"default":"image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(params.APP_NAME):latest","description":"The name of the image to build","name":"IMAGE_NAME","type":"string"}],"tasks":[{"name":"git-clone","params":[{"name":"url","value":"$(params.GIT_REPO)"},{"name":"revision","value":"$(params.GIT_REF)"},{"name":"refspec","value":""},{"name":"submodules","value":"true"},{"name":"depth","value":"1"},{"name":"sslVerify","value":"true"},{"name":"crtFileName","value":"ca-bundle.crt"},{"name":"subdirectory","value":""},{"name":"sparseCheckoutDirectories","value":""},{"name":"deleteExisting","value":"true"},{"name":"httpProxy","value":""},{"name":"httpsProxy","value":""},{"name":"noProxy","value":""},{"name":"verbose","value":"true"},{"name":"gitInitImage","value":"registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:dd5c8d08d52e304a542921634ebe6b5ff3d63c5f68f6d644e88417859b173ec8"},{"name":"userHome","value":"/home/git"}],"taskRef":{"kind":"ClusterTask","name":"git-clone"},"workspaces":[{"name":"output","workspace":"pipeline-workspace"}]},{"name":"pylint","params":[{"name":"image","value":"docker.io/python:3.11-slim"},{"name":"path","value":"service"},{"name":"args","value":[]},{"name":"requirements-file","value":"requirements.txt"}],"runAfter":["git-clone"],"taskRef":{"kind":"Task","name":"pylint"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]},{"name":"testing","params":[{"name":"pytest-args","value":[]},{"name":"secret-name","value":"postgres-creds"},{"name":"secret-key","value":"database_uri"}],"runAfter":["git-clone"],"taskRef":{"kind":"Task","name":"pytest-env"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]},{"name":"buildah","params":[{"name":"IMAGE","value":"$(params.IMAGE_NAME)"},{"name":"BUILDER_IMAGE","value":"registry.redhat.io/rhel8/buildah@sha256:5c7cd7c9a3d49e8905fc98693f6da605aeafae36bde5622dc78e12f31db3cd59"},{"name":"STORAGE_DRIVER","value":"vfs"},{"name":"DOCKERFILE","value":"./Dockerfile"},{"name":"CONTEXT","value":"."},{"name":"TLSVERIFY","value":"true"},{"name":"FORMAT","value":"oci"},{"name":"BUILD_EXTRA_ARGS","value":""},{"name":"PUSH_EXTRA_ARGS","value":""},{"name":"SKIP_PUSH","value":"false"}],"runAfter":["pylint","testing"],"taskRef":{"kind":"ClusterTask","name":"buildah"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]},{"name":"deploy-image","params":[{"name":"image-name","value":"$(params.IMAGE_NAME)"},{"name":"manifest-dir","value":"k8s"}],"runAfter":["buildah"],"taskRef":{"kind":"Task","name":"deploy-image"},"workspaces":[{"name":"source","workspace":"pipeline-workspace"}]}],"workspaces":[{"name":"pipeline-workspace"}]}}
+  creationTimestamp: '2024-12-04T02:26:11Z'
+  generation: 7
   managedFields:
     - apiVersion: tekton.dev/v1
       fieldsType: FieldsV1
@@ -14,19 +14,25 @@ metadata:
           'f:annotations':
             .: {}
             'f:kubectl.kubernetes.io/last-applied-configuration': {}
+        'f:spec': {}
+      manager: kubectl-client-side-apply
+      operation: Update
+      time: '2024-12-04T02:26:11Z'
+    - apiVersion: tekton.dev/v1
+      fieldsType: FieldsV1
+      fieldsV1:
         'f:spec':
-          .: {}
           'f:finally': {}
           'f:params': {}
           'f:tasks': {}
           'f:workspaces': {}
-      manager: kubectl-client-side-apply
+      manager: Mozilla
       operation: Update
-      time: '2024-11-27T21:52:44Z'
+      time: '2024-12-04T03:37:52Z'
   name: cd-pipeline
   namespace: safipatel-dev
-  resourceVersion: '2769184899'
-  uid: 816fee74-16f5-4cc0-9d02-bb92a6f68e4e
+  resourceVersion: '2793029441'
+  uid: 3e1caeca-d2a9-4675-8ae2-8d2056e685ca
 spec:
   params:
     - description: The URL to the git repo
@@ -43,6 +49,10 @@ spec:
     - default: 'image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(params.APP_NAME):latest'
       description: The name of the image to build
       name: IMAGE_NAME
+      type: string
+    - default: 'https://shopcarts-safipatel-dev.apps.sandbox-m4.g2pi.p1.openshiftapps.com/'
+      description: The external route for the service
+      name: BASE_URL
       type: string
   tasks:
     - name: git-clone
@@ -156,11 +166,29 @@ spec:
           value: $(params.IMAGE_NAME)
         - name: manifest-dir
           value: k8s
+        - name: wait-for-pod-label
+          value: shopcarts
       runAfter:
         - buildah
       taskRef:
         kind: Task
         name: deploy-image
+      workspaces:
+        - name: source
+          workspace: pipeline-workspace
+    - name: behave
+      params:
+        - name: base-url
+          value: $(params.BASE_URL)
+        - name: wait-seconds
+          value: '60'
+        - name: driver
+          value: chrome
+      runAfter:
+        - deploy-image
+      taskRef:
+        kind: Task
+        name: behave
       workspaces:
         - name: source
           workspace: pipeline-workspace

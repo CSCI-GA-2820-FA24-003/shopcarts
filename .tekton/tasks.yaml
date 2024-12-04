@@ -158,6 +158,9 @@ spec:
     description: The directory in source that contains yaml manifests
     type: string
     default: "k8s"
+  - name: wait-for-pod-label
+    description: The pod label value for the label "app" for the pod you want to wait the deploy-task till it gets ready.
+    type: string
   steps:
     - name: deploy
       image: quay.io/openshift/origin-cli:latest
@@ -189,6 +192,10 @@ spec:
 
           echo "************************************************************"
           sleep 3
+
+          echo "***** Waiting For Service Ready *****"
+          oc wait --for=condition=ready pod -l app=$(inputs.params.wait-for-pod-label) --timeout=360s 
+          
           echo "Pods:"
           oc get pods
           echo ""
