@@ -30,7 +30,7 @@ PUT /shopcarts/{id} - Updates a Shopcart record in the database
 DELETE /shopcarts/{id} - Deletes a Shopcart record in the database
 PUT /shopcarts/{id}/empty - Empties a Shopcart of items
 GET /shopcarts/{id}/items - Returns a list all of the Items in a shopcart
-POST /shopcarts/{id}/items - creates a new Item record in the database
+POST /shopcarts/{id}/items - Creates a new Item record in the database
 GET /shopcarts/{id}/items/{item-id} - Returns the Shopcart with a given id number
 PUT /shopcarts/{id}/items/{item-id} - updates an Item record in the database
 DELETE /shopcarts/{id}/items/{item-id}- Deletes an Item record in the database
