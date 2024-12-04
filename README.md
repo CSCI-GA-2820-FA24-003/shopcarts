@@ -38,6 +38,8 @@ tests/                          - test cases package
 ├── factories.py                - Factory for testing with fake objects
 ├── test_models.py              - test suite for business models
 └── test_routes.py              - test suite for service routes
+
+k8s/              - All the Kubernetes manifest files
 ```
 
 ## API Endpoints
