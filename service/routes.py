@@ -24,7 +24,7 @@ Paths:
 ------
 GET / - Displays a UI for Selenium testing
 GET /shopcarts - Returns a list all of the Shopcarts
-POST /shopcarts - creates a new Shopcart record in the database
+POST /shopcarts - Creates a new Shopcart record in the database
 GET /shopcarts/{id} - Returns the Shopcart with a given ID number
 PUT /shopcarts/{id} - Updates a Shopcart record in the database
 DELETE /shopcarts/{id} - Deletes a Shopcart record in the database
