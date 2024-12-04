@@ -33,7 +33,7 @@ GET /shopcarts/{id}/items - Returns a list all of the Items in a shopcart
 POST /shopcarts/{id}/items - creates a new Item record in the database
 GET /shopcarts/{id}/items/{item-id} - Returns the Shopcart with a given id number
 PUT /shopcarts/{id}/items/{item-id} - updates an Item record in the database
-DELETE /shopcarts/{id}/items/{item-id}- deletes an Item record in the database
+DELETE /shopcarts/{id}/items/{item-id}- Deletes an Item record in the database
 PUT /shopcarts/{id}/items/{item-id} - marks Item as urgent
 DELETE /shopcarts/{id}/items/{item-id} - marks Item as non-urgent
 
